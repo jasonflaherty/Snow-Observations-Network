@@ -4,10 +4,6 @@ Free, open, standardized API for global snowpack observations.
 
 SON is a **data platform**: ingest snow observations from multiple providers, normalize units, store them in PostGIS, and expose them through a versioned HTTP API.
 
-## Status
-
-Phase 1 foundation is in progress (Docker, PostGIS, FastAPI, NRCS + BC ASWS adapters).
-
 ## Quick start
 
 ```bash
@@ -15,11 +11,54 @@ cp .env.example .env
 docker compose up --build
 ```
 
-API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+- API: http://localhost:8000
+- OpenAPI docs: http://localhost:8000/docs
+- Health: http://localhost:8000/health
 
-## Mission
+Trigger an ingest manually (inside the API or worker container):
 
-> Provide a free, open, standardized API for global snowpack observations.
+```bash
+docker compose exec celery-worker python -c "from worker.ingest import ingest_all; print(ingest_all())"
+```
+
+## Example endpoints
+
+```bash
+curl http://localhost:8000/v1/stations
+curl http://localhost:8000/v1/stations/SON-CA-BCASWS-1A01P/current
+curl "http://localhost:8000/v1/stations/SON-US-NRCS-301/observations?limit=100"
+curl http://localhost:8000/v1/map/stations
+```
+
+Optional API key header:
+
+```bash
+curl -H "X-API-Key: change-me-free" http://localhost:8000/v1/stations
+```
+
+Anonymous clients are limited to 1000 requests/day (Redis-backed).
+
+## Station IDs
+
+`SON-{CC}-{PROVIDER}-{CODE}` — e.g. `SON-US-NRCS-301`, `SON-CA-BCASWS-2F05P`.
+
+## Local tests
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pytest
+```
+
+## Phase 1 providers
+
+| Provider | Source |
+|----------|--------|
+| NRCS | USDA AWDB REST (`/stations`, `/data`) |
+| BC ASWS | Province CSVs (`SW/SD/PC/TA.csv`) + seeded station catalog |
+
+See [docs/architecture.md](docs/architecture.md).
 
 ## License
 
@@ -27,7 +66,5 @@ MIT — see [LICENSE](LICENSE).
 
 ## Attribution
 
-Upstream data providers retain their own terms. Planned Phase 1 sources include:
-
-- USDA NRCS AWDB / SNOTEL
-- British Columbia ASWS (Open Government Licence – British Columbia)
+- USDA Natural Resources Conservation Service AWDB / SNOTEL
+- Province of British Columbia ASWS (Open Government Licence – British Columbia)
