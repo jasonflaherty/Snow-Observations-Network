@@ -1,0 +1,1066 @@
+[
+  {
+    "station_code": "1A01P",
+    "name": "Yellowhead Lake",
+    "latitude": 52.90622,
+    "longitude": -118.5475,
+    "elevation_m": 1859.9,
+    "active": true
+  },
+  {
+    "station_code": "1A02P",
+    "name": "McBride Upper",
+    "latitude": 53.30604,
+    "longitude": -120.31926,
+    "elevation_m": 1610.0,
+    "active": true
+  },
+  {
+    "station_code": "1A03P",
+    "name": "Barkerville",
+    "latitude": 53.057338,
+    "longitude": -121.491828,
+    "elevation_m": 1470.1,
+    "active": true
+  },
+  {
+    "station_code": "1A05P",
+    "name": "Longworth Upper",
+    "latitude": 53.95083,
+    "longitude": -121.4431,
+    "elevation_m": 1740.1,
+    "active": true
+  },
+  {
+    "station_code": "1A12P",
+    "name": "Kaza Lake",
+    "latitude": 56.021192,
+    "longitude": -126.297597,
+    "elevation_m": 1257.0,
+    "active": true
+  },
+  {
+    "station_code": "1A14P",
+    "name": "Hedrick Lake",
+    "latitude": 54.105778,
+    "longitude": -121.0,
+    "elevation_m": 1129.9,
+    "active": true
+  },
+  {
+    "station_code": "1A15P",
+    "name": "Knudsen Lake",
+    "latitude": 54.30266,
+    "longitude": -120.782813,
+    "elevation_m": 1580.1,
+    "active": true
+  },
+  {
+    "station_code": "1A17P",
+    "name": "Revolution Creek",
+    "latitude": 53.78422,
+    "longitude": -120.3752,
+    "elevation_m": 1680.1,
+    "active": true
+  },
+  {
+    "station_code": "1A19P",
+    "name": "Dome Mountain",
+    "latitude": 53.621861,
+    "longitude": -121.023111,
+    "elevation_m": 1773.9,
+    "active": true
+  },
+  {
+    "station_code": "1B01P",
+    "name": "Mount Wells",
+    "latitude": 53.72861,
+    "longitude": -126.423614,
+    "elevation_m": 1489.9,
+    "active": true
+  },
+  {
+    "station_code": "1B02P",
+    "name": "Tahtsa Lake",
+    "latitude": 53.593055,
+    "longitude": -127.64389,
+    "elevation_m": 1300.0,
+    "active": true
+  },
+  {
+    "station_code": "1B08P",
+    "name": "Mt. Pondosy",
+    "latitude": 53.1525,
+    "longitude": -126.881111,
+    "elevation_m": 1399.9,
+    "active": true
+  },
+  {
+    "station_code": "1C05P",
+    "name": "McGillivray Pass",
+    "latitude": 50.698556,
+    "longitude": -122.625375,
+    "elevation_m": 1717.9,
+    "active": true
+  },
+  {
+    "station_code": "1C12P",
+    "name": "Green Mountain",
+    "latitude": 50.795633,
+    "longitude": -122.924542,
+    "elevation_m": 1780.0,
+    "active": true
+  },
+  {
+    "station_code": "1C14P",
+    "name": "Bralorne",
+    "latitude": 50.775189,
+    "longitude": -122.788819,
+    "elevation_m": 1382.0,
+    "active": true
+  },
+  {
+    "station_code": "1C17P",
+    "name": "Mount Timothy",
+    "latitude": 51.90453,
+    "longitude": -121.25604,
+    "elevation_m": 1630.1,
+    "active": true
+  },
+  {
+    "station_code": "1C18P",
+    "name": "Mission Ridge",
+    "latitude": 50.762556,
+    "longitude": -122.207694,
+    "elevation_m": 1850.1,
+    "active": true
+  },
+  {
+    "station_code": "1C20P",
+    "name": "Boss Mountain Mine",
+    "latitude": 52.1069,
+    "longitude": -120.86727,
+    "elevation_m": 1460.0,
+    "active": true
+  },
+  {
+    "station_code": "1C22AP",
+    "name": "Puntzi Mountain",
+    "latitude": 52.109,
+    "longitude": -124.15273,
+    "elevation_m": 919.9,
+    "active": true
+  },
+  {
+    "station_code": "1C23P",
+    "name": "Penfold Creek",
+    "latitude": 52.74882,
+    "longitude": -120.56057,
+    "elevation_m": 1740.1,
+    "active": true
+  },
+  {
+    "station_code": "1C29P",
+    "name": "Shovelnose Mountain",
+    "latitude": 49.855951,
+    "longitude": -120.862891,
+    "elevation_m": 1460.0,
+    "active": true
+  },
+  {
+    "station_code": "1C32P",
+    "name": "Deadman River",
+    "latitude": 51.098512,
+    "longitude": -120.609694,
+    "elevation_m": 1460.0,
+    "active": true
+  },
+  {
+    "station_code": "1C38P",
+    "name": "Downton Lake Upper",
+    "latitude": 50.859792,
+    "longitude": -123.183633,
+    "elevation_m": 1829.1,
+    "active": true
+  },
+  {
+    "station_code": "1C40P",
+    "name": "North Tyaughton",
+    "latitude": 51.147525,
+    "longitude": -122.793753,
+    "elevation_m": 1969.0,
+    "active": true
+  },
+  {
+    "station_code": "1C41P",
+    "name": "Yanks Peak",
+    "latitude": 52.83201,
+    "longitude": -121.35564,
+    "elevation_m": 1670.0,
+    "active": true
+  },
+  {
+    "station_code": "1C43P",
+    "name": "Bridge Glacier Proglacial Lake",
+    "latitude": 50.831492,
+    "longitude": -123.486422,
+    "elevation_m": 1505.1,
+    "active": true
+  },
+  {
+    "station_code": "1C44P",
+    "name": "Paradise Lake",
+    "latitude": 49.948639,
+    "longitude": -120.282278,
+    "elevation_m": 1640.1,
+    "active": true
+  },
+  {
+    "station_code": "1C45P",
+    "name": "July Mountain",
+    "latitude": 49.707639,
+    "longitude": -121.085472,
+    "elevation_m": 1859.9,
+    "active": true
+  },
+  {
+    "station_code": "1D06P",
+    "name": "Tenquille Lake",
+    "latitude": 50.53625,
+    "longitude": -122.92996,
+    "elevation_m": 1680.1,
+    "active": true
+  },
+  {
+    "station_code": "1D08P",
+    "name": "Lamont Creek Upper",
+    "latitude": 49.581909,
+    "longitude": -122.314283,
+    "elevation_m": 1207.9,
+    "active": true
+  },
+  {
+    "station_code": "1D09P",
+    "name": "Wahleach Lake",
+    "latitude": 49.23275,
+    "longitude": -121.579883,
+    "elevation_m": 1480.1,
+    "active": true
+  },
+  {
+    "station_code": "1D16P",
+    "name": "Dickson Lake",
+    "latitude": 49.316704,
+    "longitude": -122.06965,
+    "elevation_m": 1154.9,
+    "active": true
+  },
+  {
+    "station_code": "1D17P",
+    "name": "Chilliwack River",
+    "latitude": 49.0315,
+    "longitude": -121.7121,
+    "elevation_m": 1620.0,
+    "active": true
+  },
+  {
+    "station_code": "1D18P",
+    "name": "Disappointment Lake",
+    "latitude": 49.555,
+    "longitude": -122.758333,
+    "elevation_m": 1050.0,
+    "active": true
+  },
+  {
+    "station_code": "1D19P",
+    "name": "Spuzzum",
+    "latitude": 49.660831,
+    "longitude": -121.660835,
+    "elevation_m": 1179.9,
+    "active": true
+  },
+  {
+    "station_code": "1E02P",
+    "name": "Mount Cook",
+    "latitude": 52.18214,
+    "longitude": -119.3227,
+    "elevation_m": 1570.0,
+    "active": true
+  },
+  {
+    "station_code": "1E03AP",
+    "name": "Trophy Mountain",
+    "latitude": 51.808369,
+    "longitude": -119.940639,
+    "elevation_m": 1880.0,
+    "active": true
+  },
+  {
+    "station_code": "1E08P",
+    "name": "Azure River",
+    "latitude": 52.595917,
+    "longitude": -119.722694,
+    "elevation_m": 1640.1,
+    "active": true
+  },
+  {
+    "station_code": "1E10P",
+    "name": "Kostal Lake",
+    "latitude": 52.203334,
+    "longitude": -120.016944,
+    "elevation_m": 1770.0,
+    "active": true
+  },
+  {
+    "station_code": "1E14P",
+    "name": "Cook Creek",
+    "latitude": 52.167777,
+    "longitude": -119.303888,
+    "elevation_m": 1279.9,
+    "active": true
+  },
+  {
+    "station_code": "1F03P",
+    "name": "Park Mountain",
+    "latitude": 50.44961,
+    "longitude": -118.61856,
+    "elevation_m": 1890.1,
+    "active": true
+  },
+  {
+    "station_code": "1F04P",
+    "name": "Enderby",
+    "latitude": 50.653025,
+    "longitude": -118.926903,
+    "elevation_m": 1950.1,
+    "active": true
+  },
+  {
+    "station_code": "1F06P",
+    "name": "Celista",
+    "latitude": 51.405917,
+    "longitude": -118.986,
+    "elevation_m": 1499.9,
+    "active": true
+  },
+  {
+    "station_code": "2A06P",
+    "name": "Mount Revelstoke",
+    "latitude": 51.036342,
+    "longitude": -118.151603,
+    "elevation_m": 1850.1,
+    "active": true
+  },
+  {
+    "station_code": "2A18P",
+    "name": "Keystone Creek",
+    "latitude": 51.411289,
+    "longitude": -118.360656,
+    "elevation_m": 1840.1,
+    "active": true
+  },
+  {
+    "station_code": "2A21P",
+    "name": "Molson Creek",
+    "latitude": 52.220556,
+    "longitude": -118.225833,
+    "elevation_m": 1934.9,
+    "active": true
+  },
+  {
+    "station_code": "2A27P",
+    "name": "Downie Slide Lower",
+    "latitude": 51.511984,
+    "longitude": -118.529865,
+    "elevation_m": 965.0,
+    "active": true
+  },
+  {
+    "station_code": "2A30P",
+    "name": "Colpitti Creek",
+    "latitude": 51.607722,
+    "longitude": -117.610861,
+    "elevation_m": 2130.9,
+    "active": true
+  },
+  {
+    "station_code": "2A31P",
+    "name": "Caribou Creek",
+    "latitude": 51.109028,
+    "longitude": -117.228417,
+    "elevation_m": 2201.0,
+    "active": true
+  },
+  {
+    "station_code": "2A32P",
+    "name": "Wildcat Creek",
+    "latitude": 51.696303,
+    "longitude": -116.629411,
+    "elevation_m": 2122.0,
+    "active": true
+  },
+  {
+    "station_code": "2A33P",
+    "name": "Conrad Glacier",
+    "latitude": 50.812033,
+    "longitude": -116.93975,
+    "elevation_m": 2599.0,
+    "active": true
+  },
+  {
+    "station_code": "2A34P",
+    "name": "Glacier NP Rogers Pass Lower",
+    "latitude": 51.270116,
+    "longitude": -117.509425,
+    "elevation_m": 1182.0,
+    "active": true
+  },
+  {
+    "station_code": "2A35P",
+    "name": "Fred Laing Lower",
+    "latitude": 52.05381,
+    "longitude": -118.58594,
+    "elevation_m": 577.0,
+    "active": true
+  },
+  {
+    "station_code": "2B02AP",
+    "name": "Farron",
+    "latitude": 49.27017,
+    "longitude": -118.13016,
+    "elevation_m": 1229.9,
+    "active": true
+  },
+  {
+    "station_code": "2B06P",
+    "name": "Barnes Creek",
+    "latitude": 50.068553,
+    "longitude": -118.351122,
+    "elevation_m": 1620.0,
+    "active": true
+  },
+  {
+    "station_code": "2B08P",
+    "name": "St. Leon Creek",
+    "latitude": 50.434172,
+    "longitude": -117.701214,
+    "elevation_m": 1800.1,
+    "active": true
+  },
+  {
+    "station_code": "2B10P",
+    "name": "Fauquier Water Treatment Plant",
+    "latitude": 49.864182,
+    "longitude": -118.074228,
+    "elevation_m": 519.1,
+    "active": true
+  },
+  {
+    "station_code": "2C09Q",
+    "name": "Morrissey Ridge",
+    "latitude": 49.447222,
+    "longitude": -114.975,
+    "elevation_m": 1859.9,
+    "active": true
+  },
+  {
+    "station_code": "2C10P",
+    "name": "Moyie Mountain",
+    "latitude": 49.2515,
+    "longitude": -115.7739,
+    "elevation_m": 1834.9,
+    "active": true
+  },
+  {
+    "station_code": "2C14P",
+    "name": "Floe Lake",
+    "latitude": 51.059917,
+    "longitude": -116.137117,
+    "elevation_m": 2090.0,
+    "active": true
+  },
+  {
+    "station_code": "2C17AP",
+    "name": "Thunder Creek",
+    "latitude": 50.160831,
+    "longitude": -115.267089,
+    "elevation_m": 1599.0,
+    "active": true
+  },
+  {
+    "station_code": "2C21P",
+    "name": "Fernie",
+    "latitude": 49.48825,
+    "longitude": -115.072611,
+    "elevation_m": 987.9,
+    "active": true
+  },
+  {
+    "station_code": "2D05P",
+    "name": "Gray Creek Lower",
+    "latitude": 49.61142,
+    "longitude": -116.6788,
+    "elevation_m": 1649.9,
+    "active": true
+  },
+  {
+    "station_code": "2D07AP",
+    "name": "Duncan Lake Dam 2",
+    "latitude": 50.238723,
+    "longitude": -116.971343,
+    "elevation_m": 559.0,
+    "active": true
+  },
+  {
+    "station_code": "2D08P",
+    "name": "East Creek",
+    "latitude": 50.6396,
+    "longitude": -116.929733,
+    "elevation_m": 2030.0,
+    "active": true
+  },
+  {
+    "station_code": "2D10P",
+    "name": "Gray Creek Upper",
+    "latitude": 49.61656,
+    "longitude": -116.6589,
+    "elevation_m": 1930.0,
+    "active": true
+  },
+  {
+    "station_code": "2D14P",
+    "name": "Redfish Creek",
+    "latitude": 49.69008,
+    "longitude": -117.0865,
+    "elevation_m": 2100.1,
+    "active": true
+  },
+  {
+    "station_code": "2D15P",
+    "name": "Kaslo Airport",
+    "latitude": 49.90375,
+    "longitude": -116.928278,
+    "elevation_m": 716.9,
+    "active": true
+  },
+  {
+    "station_code": "2D16P",
+    "name": "New Denver East",
+    "latitude": 49.996657,
+    "longitude": -117.358372,
+    "elevation_m": 652.9,
+    "active": true
+  },
+  {
+    "station_code": "2E07P",
+    "name": "Grano Creek",
+    "latitude": 49.55197,
+    "longitude": -118.6773,
+    "elevation_m": 1869.9,
+    "active": true
+  },
+  {
+    "station_code": "2F01AP",
+    "name": "Trout Creek West",
+    "latitude": 49.74017,
+    "longitude": -120.1891,
+    "elevation_m": 1420.1,
+    "active": true
+  },
+  {
+    "station_code": "2F03AP",
+    "name": "McCulloch",
+    "latitude": 49.76731,
+    "longitude": -119.12403,
+    "elevation_m": 1245.1,
+    "active": true
+  },
+  {
+    "station_code": "2F05P",
+    "name": "Mission Creek",
+    "latitude": 49.94467,
+    "longitude": -118.9497,
+    "elevation_m": 1780.0,
+    "active": true
+  },
+  {
+    "station_code": "2F08P",
+    "name": "Greyback Reservoir",
+    "latitude": 49.616344,
+    "longitude": -119.422678,
+    "elevation_m": 1549.9,
+    "active": true
+  },
+  {
+    "station_code": "2F09P",
+    "name": "Whiterocks Mountain",
+    "latitude": 50.01669,
+    "longitude": -119.7461,
+    "elevation_m": 1800.1,
+    "active": true
+  },
+  {
+    "station_code": "2F10P",
+    "name": "Silver Star Mountain",
+    "latitude": 50.37136,
+    "longitude": -119.06211,
+    "elevation_m": 1840.1,
+    "active": true
+  },
+  {
+    "station_code": "2F18P",
+    "name": "Brenda Mine",
+    "latitude": 49.862361,
+    "longitude": -119.982111,
+    "elevation_m": 1460.0,
+    "active": true
+  },
+  {
+    "station_code": "2F19P",
+    "name": "Oyama Lake",
+    "latitude": 50.11633,
+    "longitude": -119.279,
+    "elevation_m": 1360.0,
+    "active": true
+  },
+  {
+    "station_code": "2F26P",
+    "name": "Ellis Creek",
+    "latitude": 49.4127,
+    "longitude": -119.38332,
+    "elevation_m": 1539.8,
+    "active": true
+  },
+  {
+    "station_code": "2G03P",
+    "name": "Blackwall Peak",
+    "latitude": 49.09414,
+    "longitude": -120.7725,
+    "elevation_m": 1940.1,
+    "active": true
+  },
+  {
+    "station_code": "2G06P",
+    "name": "Hamilton Hill",
+    "latitude": 49.49914,
+    "longitude": -120.79439,
+    "elevation_m": 1480.1,
+    "active": true
+  },
+  {
+    "station_code": "3A09P",
+    "name": "Palisade Lake",
+    "latitude": 49.454444,
+    "longitude": -123.031944,
+    "elevation_m": 900.1,
+    "active": true
+  },
+  {
+    "station_code": "3A19P",
+    "name": "Orchid Lake",
+    "latitude": 49.535833,
+    "longitude": -123.050834,
+    "elevation_m": 1179.9,
+    "active": true
+  },
+  {
+    "station_code": "3A20P",
+    "name": "Callaghan Creek",
+    "latitude": 50.137056,
+    "longitude": -123.102889,
+    "elevation_m": 1017.1,
+    "active": true
+  },
+  {
+    "station_code": "3A22P",
+    "name": "Nostetuko River",
+    "latitude": 51.24325,
+    "longitude": -124.459583,
+    "elevation_m": 1499.9,
+    "active": true
+  },
+  {
+    "station_code": "3A24P",
+    "name": "Mosley Creek Upper",
+    "latitude": 51.77617,
+    "longitude": -124.6218,
+    "elevation_m": 1649.9,
+    "active": true
+  },
+  {
+    "station_code": "3A25P",
+    "name": "Squamish River Upper",
+    "latitude": 50.1543,
+    "longitude": -123.4361,
+    "elevation_m": 1360.0,
+    "active": true
+  },
+  {
+    "station_code": "3A28P",
+    "name": "Tetrahedron",
+    "latitude": 49.59785,
+    "longitude": -123.60499,
+    "elevation_m": 1420.1,
+    "active": true
+  },
+  {
+    "station_code": "3A29P",
+    "name": "Loch Lomand",
+    "latitude": 49.592,
+    "longitude": -123.0444,
+    "elevation_m": 1069.8,
+    "active": true
+  },
+  {
+    "station_code": "3B17P",
+    "name": "Wolf River Upper",
+    "latitude": 49.704139,
+    "longitude": -125.67925,
+    "elevation_m": 1489.9,
+    "active": true
+  },
+  {
+    "station_code": "3B23P",
+    "name": "Jump Creek",
+    "latitude": 48.969505,
+    "longitude": -124.276182,
+    "elevation_m": 1160.1,
+    "active": true
+  },
+  {
+    "station_code": "3B24P",
+    "name": "Heather Mountain Upper",
+    "latitude": 48.943875,
+    "longitude": -124.452113,
+    "elevation_m": 1189.9,
+    "active": true
+  },
+  {
+    "station_code": "3B26P",
+    "name": "Mount Arrowsmith",
+    "latitude": 49.207376,
+    "longitude": -124.567776,
+    "elevation_m": 1464.9,
+    "active": true
+  },
+  {
+    "station_code": "3B27P",
+    "name": "Cobble Hill",
+    "latitude": 48.69899,
+    "longitude": -123.59287,
+    "elevation_m": 85.0,
+    "active": true
+  },
+  {
+    "station_code": "3B28P",
+    "name": "Chris Creek",
+    "latitude": 48.580278,
+    "longitude": -123.840556,
+    "elevation_m": 559.9,
+    "active": true
+  },
+  {
+    "station_code": "3B29P",
+    "name": "Martins Gulch",
+    "latitude": 48.516111,
+    "longitude": -123.764444,
+    "elevation_m": 512.1,
+    "active": true
+  },
+  {
+    "station_code": "3B30P",
+    "name": "Sooke Dam",
+    "latitude": 48.516111,
+    "longitude": -123.700556,
+    "elevation_m": 171.9,
+    "active": true
+  },
+  {
+    "station_code": "3B31P",
+    "name": "Survey Mountain",
+    "latitude": 48.559167,
+    "longitude": -123.799167,
+    "elevation_m": 940.0,
+    "active": true
+  },
+  {
+    "station_code": "3C08P",
+    "name": "Burnt Bridge Creek",
+    "latitude": 52.480889,
+    "longitude": -126.247833,
+    "elevation_m": 1330.1,
+    "active": true
+  },
+  {
+    "station_code": "4A02P",
+    "name": "Pine Pass",
+    "latitude": 55.353,
+    "longitude": -122.637333,
+    "elevation_m": 1399.9,
+    "active": true
+  },
+  {
+    "station_code": "4A03P",
+    "name": "Ware Upper",
+    "latitude": 57.396181,
+    "longitude": -125.700469,
+    "elevation_m": 1565.1,
+    "active": true
+  },
+  {
+    "station_code": "4A04P",
+    "name": "Ware Lower",
+    "latitude": 57.407556,
+    "longitude": -125.677339,
+    "elevation_m": 971.1,
+    "active": true
+  },
+  {
+    "station_code": "4A09P",
+    "name": "Pulpit Lake",
+    "latitude": 57.548583,
+    "longitude": -126.748314,
+    "elevation_m": 1310.9,
+    "active": true
+  },
+  {
+    "station_code": "4A10P",
+    "name": "Fredrickson Lake",
+    "latitude": 56.948458,
+    "longitude": -126.520716,
+    "elevation_m": 1325.9,
+    "active": true
+  },
+  {
+    "station_code": "4A12P",
+    "name": "Tsaydaychi Lake",
+    "latitude": 55.41635,
+    "longitude": -124.763,
+    "elevation_m": 0.0,
+    "active": true
+  },
+  {
+    "station_code": "4A13P",
+    "name": "Philip Lake",
+    "latitude": 55.1238,
+    "longitude": -123.897927,
+    "elevation_m": 1028.1,
+    "active": true
+  },
+  {
+    "station_code": "4A18P",
+    "name": "Mount Sheba",
+    "latitude": 54.526667,
+    "longitude": -121.804167,
+    "elevation_m": 1489.9,
+    "active": true
+  },
+  {
+    "station_code": "4A20P",
+    "name": "Monkman Creek",
+    "latitude": 54.725281,
+    "longitude": -121.231697,
+    "elevation_m": 1570.0,
+    "active": true
+  },
+  {
+    "station_code": "4A27P",
+    "name": "Kwadacha North",
+    "latitude": 57.623333,
+    "longitude": -125.073167,
+    "elevation_m": 1553.9,
+    "active": true
+  },
+  {
+    "station_code": "4A30P",
+    "name": "Aiken Lake",
+    "latitude": 56.43686,
+    "longitude": -125.7417,
+    "elevation_m": 1050.0,
+    "active": true
+  },
+  {
+    "station_code": "4A31P",
+    "name": "Crying Girl Prairie",
+    "latitude": 56.385861,
+    "longitude": -122.892833,
+    "elevation_m": 1357.9,
+    "active": true
+  },
+  {
+    "station_code": "4A33P",
+    "name": "Muskwa-Kechika",
+    "latitude": 56.781389,
+    "longitude": -123.106389,
+    "elevation_m": 1196.0,
+    "active": true
+  },
+  {
+    "station_code": "4A34P",
+    "name": "Dowling Creek",
+    "latitude": 55.825083,
+    "longitude": -122.43625,
+    "elevation_m": 1456.0,
+    "active": true
+  },
+  {
+    "station_code": "4A35P",
+    "name": "Germansen Landing",
+    "latitude": 55.785528,
+    "longitude": -124.701444,
+    "elevation_m": 766.0,
+    "active": true
+  },
+  {
+    "station_code": "4A36P",
+    "name": "Parsnip Upper",
+    "latitude": 54.605556,
+    "longitude": -122.137583,
+    "elevation_m": 790.0,
+    "active": true
+  },
+  {
+    "station_code": "4A37P",
+    "name": "McQue Terrace",
+    "latitude": 56.9815,
+    "longitude": -123.404167,
+    "elevation_m": 1200.0,
+    "active": true
+  },
+  {
+    "station_code": "4A38P",
+    "name": "Horn Creek",
+    "latitude": 56.734766,
+    "longitude": -123.606,
+    "elevation_m": 1449.9,
+    "active": true
+  },
+  {
+    "station_code": "4A39P",
+    "name": "Chowade Upper",
+    "latitude": 56.636833,
+    "longitude": -122.778867,
+    "elevation_m": 1480.1,
+    "active": true
+  },
+  {
+    "station_code": "4A40P",
+    "name": "Crocker Creek",
+    "latitude": 54.93481,
+    "longitude": -122.18292,
+    "elevation_m": 994.9,
+    "active": true
+  },
+  {
+    "station_code": "4B02P",
+    "name": "Johanson Lake",
+    "latitude": 56.605415,
+    "longitude": -126.19401,
+    "elevation_m": 1467.0,
+    "active": true
+  },
+  {
+    "station_code": "4B15P",
+    "name": "Lu Lake",
+    "latitude": 54.19683,
+    "longitude": -126.3041,
+    "elevation_m": 1300.0,
+    "active": true
+  },
+  {
+    "station_code": "4B16P",
+    "name": "Shedin Creek",
+    "latitude": 55.861653,
+    "longitude": -127.69842,
+    "elevation_m": 1480.1,
+    "active": true
+  },
+  {
+    "station_code": "4B17P",
+    "name": "Tsai Creek",
+    "latitude": 54.645906,
+    "longitude": -127.674272,
+    "elevation_m": 1360.0,
+    "active": true
+  },
+  {
+    "station_code": "4B18P",
+    "name": "Cedar-Kiteen",
+    "latitude": 55.152028,
+    "longitude": -128.711028,
+    "elevation_m": 885.1,
+    "active": true
+  },
+  {
+    "station_code": "4B19P",
+    "name": "Upper Skeena",
+    "latitude": 56.538,
+    "longitude": -127.657,
+    "elevation_m": 1537.1,
+    "active": true
+  },
+  {
+    "station_code": "4C01P",
+    "name": "Sikanni Lake",
+    "latitude": 57.263756,
+    "longitude": -124.131981,
+    "elevation_m": 1387.1,
+    "active": true
+  },
+  {
+    "station_code": "4C09P",
+    "name": "Deadwood River",
+    "latitude": 59.25745,
+    "longitude": -128.31979,
+    "elevation_m": 1250.0,
+    "active": true
+  },
+  {
+    "station_code": "4D10P",
+    "name": "Tumeka Creek",
+    "latitude": 57.238829,
+    "longitude": -129.706672,
+    "elevation_m": 1220.1,
+    "active": true
+  },
+  {
+    "station_code": "4D11P",
+    "name": "Kinaskan Lake",
+    "latitude": 57.57869,
+    "longitude": -130.262739,
+    "elevation_m": 1019.9,
+    "active": true
+  },
+  {
+    "station_code": "4D14P",
+    "name": "Wade Lake",
+    "latitude": 58.18419,
+    "longitude": -128.91216,
+    "elevation_m": 1430.1,
+    "active": true
+  },
+  {
+    "station_code": "4D16P",
+    "name": "Forrest Kerr Mid Elevation Snow",
+    "latitude": 56.753333,
+    "longitude": -130.691111,
+    "elevation_m": 1192.1,
+    "active": true
+  },
+  {
+    "station_code": "4D17P",
+    "name": "Forrest Kerr High Elevation Snow",
+    "latitude": 56.758889,
+    "longitude": -130.746389,
+    "elevation_m": 1622.1,
+    "active": true
+  },
+  {
+    "station_code": "4E01P",
+    "name": "Log Cabin",
+    "latitude": 59.764044,
+    "longitude": -134.965611,
+    "elevation_m": 890.0,
+    "active": true
+  }
+]
