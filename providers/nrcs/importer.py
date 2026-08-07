@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from datetime import datetime, timezone
 from typing import Any
 
@@ -13,16 +14,24 @@ from son_core.units import fahrenheit_to_celsius, inches_to_cm, inches_to_mm
 
 AWDB_BASE = "https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1"
 NETWORKS = {"SNTL", "SCAN", "MSTL"}
+logger = logging.getLogger(__name__)
 
 
 class NrcsProvider:
     provider_id = "NRCS"
 
-    def __init__(self, client: httpx.Client | None = None) -> None:
+    def __init__(
+        self,
+        client: httpx.Client | None = None,
+        *,
+        timeout: float = 180.0,
+        batch_size: int = 5,
+    ) -> None:
         self._owns_client = client is None
+        self.batch_size = batch_size
         settings = get_settings()
         self._client = client or httpx.Client(
-            timeout=60.0,
+            timeout=timeout,
             headers={"User-Agent": settings.son_user_agent},
         )
 
@@ -90,25 +99,61 @@ class NrcsProvider:
             return []
 
         observations: list[NormalizedObservation] = []
-        # Batch to avoid oversized URLs
-        batch_size = 50
+        batch_size = self.batch_size
         for i in range(0, len(triplets), batch_size):
             batch = triplets[i : i + batch_size]
-            params = {
-                "beginDate": _fmt(start),
-                "endDate": _fmt(end),
-                "duration": "HOURLY",
-                "elements": "WTEQ,SNWD,TOBS,PREC",
-                "stationTriplets": ",".join(batch),
-                "periodRef": "START",
-                "returnSuspectData": "false",
-            }
+            observations.extend(self._fetch_data_batch(batch, start=start, end=end))
+        return observations
+
+    def _fetch_data_batch(
+        self,
+        batch: list[str],
+        *,
+        start: datetime,
+        end: datetime,
+    ) -> list[NormalizedObservation]:
+        """Fetch one AWDB batch; on 5xx, split the batch or skip a single bad station."""
+        if not batch:
+            return []
+        params = {
+            "beginDate": _fmt(start),
+            "endDate": _fmt(end),
+            "duration": "HOURLY",
+            "elements": "WTEQ,SNWD,TOBS,PREC",
+            "stationTriplets": ",".join(batch),
+            "periodRef": "START",
+            "returnSuspectData": "false",
+        }
+        try:
             resp = self._client.get(f"{AWDB_BASE}/data", params=params)
             resp.raise_for_status()
-            stamp = datetime.now(timezone.utc).strftime("%H%M%S")
-            archive_raw(self.provider_id, f"data_{stamp}_{i}.json", resp.text)
-            observations.extend(_parse_awdb_data(resp.json()))
-        return observations
+        except httpx.HTTPStatusError as exc:
+            status = exc.response.status_code if exc.response is not None else 0
+            if status >= 500 and len(batch) > 1:
+                mid = len(batch) // 2
+                logger.warning(
+                    "AWDB %s for %d stations; splitting batch", status, len(batch)
+                )
+                return self._fetch_data_batch(
+                    batch[:mid], start=start, end=end
+                ) + self._fetch_data_batch(batch[mid:], start=start, end=end)
+            if status >= 500 and len(batch) == 1:
+                logger.warning("AWDB %s for station %s; skipping", status, batch[0])
+                return []
+            raise
+        except httpx.TimeoutException:
+            if len(batch) > 1:
+                mid = len(batch) // 2
+                logger.warning("AWDB timeout for %d stations; splitting", len(batch))
+                return self._fetch_data_batch(
+                    batch[:mid], start=start, end=end
+                ) + self._fetch_data_batch(batch[mid:], start=start, end=end)
+            logger.warning("AWDB timeout for station %s; skipping", batch[0])
+            return []
+
+        stamp = datetime.now(timezone.utc).strftime("%H%M%S")
+        archive_raw(self.provider_id, f"data_{stamp}_{batch[0].replace(':', '_')}.json", resp.text)
+        return _parse_awdb_data(resp.json())
 
 
 def _fmt(dt: datetime) -> str:

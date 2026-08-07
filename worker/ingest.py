@@ -90,44 +90,121 @@ def upsert_observations(db: Session, observations) -> int:
     if not rows:
         return 0
 
-    stmt = insert(Observation).values(rows)
-    stmt = stmt.on_conflict_do_update(
-        constraint="uq_station_timestamp",
-        set_={
-            "swe_mm": stmt.excluded.swe_mm,
-            "snow_depth_cm": stmt.excluded.snow_depth_cm,
-            "snowfall_cm": stmt.excluded.snowfall_cm,
-            "temperature_c": stmt.excluded.temperature_c,
-            "precipitation_mm": stmt.excluded.precipitation_mm,
-            "wind_speed_ms": stmt.excluded.wind_speed_ms,
-            "humidity": stmt.excluded.humidity,
-            "quality_flag": stmt.excluded.quality_flag,
-        },
-    )
-    db.execute(stmt)
+    # Postgres binds max 65535 params; ~10 columns/row → keep batches under ~5000
+    batch_rows = 500
+    inserted = 0
+    for i in range(0, len(rows), batch_rows):
+        chunk = rows[i : i + batch_rows]
+        stmt = insert(Observation).values(chunk)
+        stmt = stmt.on_conflict_do_update(
+            constraint="uq_station_timestamp",
+            set_={
+                "swe_mm": stmt.excluded.swe_mm,
+                "snow_depth_cm": stmt.excluded.snow_depth_cm,
+                "snowfall_cm": stmt.excluded.snowfall_cm,
+                "temperature_c": stmt.excluded.temperature_c,
+                "precipitation_mm": stmt.excluded.precipitation_mm,
+                "wind_speed_ms": stmt.excluded.wind_speed_ms,
+                "humidity": stmt.excluded.humidity,
+                "quality_flag": stmt.excluded.quality_flag,
+            },
+        )
+        db.execute(stmt)
+        inserted += len(chunk)
     db.commit()
-    return len(rows)
+    return inserted
 
 
-def ingest_nrcs(*, hours: int = 72) -> dict:
-    provider = NrcsProvider()
+def _sntl_triplets_from_db(db: Session, *, max_stations: int | None) -> list[str]:
+    rows = db.scalars(
+        select(Station)
+        .where(
+            Station.provider_id == "NRCS",
+            Station.active.is_(True),
+            Station.external_id.is_not(None),
+            Station.external_id.like("%:SNTL"),
+        )
+        .order_by(Station.id)
+    ).all()
+    triplets = [s.external_id for s in rows if s.external_id]
+    # Keep Adin Mtn first when capping / for easier smoke checks
+    priority = "301:CA:SNTL"
+    if priority in triplets:
+        triplets = [priority] + [t for t in triplets if t != priority]
+    if max_stations is None:
+        return triplets
+    return triplets[:max_stations]
+
+
+def ingest_nrcs(
+    *,
+    hours: int = 48,
+    max_stations: int | None = None,
+    refresh_stations: bool = False,
+) -> dict:
+    """Ingest NRCS observations for active SNTL stations only.
+
+    Hourly cadence uses hours=48 (overlap for gap fill). Use
+    ``ingest_nrcs_backfill`` (or hours=168) for a 7-day historical pull.
+    ``max_stations=None`` means all active SNTL triplets in Postgres.
+    """
+    provider = NrcsProvider(timeout=180.0, batch_size=5)
     db = SessionLocal()
     try:
-        stations = provider.get_stations()
-        n_stations = upsert_stations(db, stations)
+        n_stations = 0
+        if refresh_stations:
+            stations = provider.get_stations()
+            n_stations = upsert_stations(db, stations)
+
+        triplets = _sntl_triplets_from_db(db, max_stations=max_stations)
+        if not triplets:
+            # Cold start: fetch catalog, then select SNTL
+            stations = provider.get_stations()
+            n_stations = upsert_stations(db, stations)
+            triplets = [
+                s.external_id
+                for s in stations
+                if s.active and s.external_id and s.external_id.endswith(":SNTL")
+            ]
+            if "301:CA:SNTL" in triplets:
+                triplets = ["301:CA:SNTL"] + [t for t in triplets if t != "301:CA:SNTL"]
+            if max_stations is not None:
+                triplets = triplets[:max_stations]
+
         end = datetime.now(timezone.utc)
         start = end - timedelta(hours=hours)
-        # Prefer active SNTL triplets for recent data; batch subset for MVP reliability
-        triplets = [s.external_id for s in stations if s.active and s.external_id][:200]
-        observations = provider.get_observations(
-            start=start, end=end, station_triplets=triplets
-        )
-        n_obs = upsert_observations(db, observations)
+        # Upsert in chunks so a mid-run failure keeps earlier progress
+        chunk_size = 50
+        n_obs = 0
+        for i in range(0, len(triplets), chunk_size):
+            chunk = triplets[i : i + chunk_size]
+            observations = provider.get_observations(
+                start=start, end=end, station_triplets=chunk
+            )
+            n_obs += upsert_observations(db, observations)
+            logger.info(
+                "NRCS SNTL progress %d/%d stations, observations so far %d",
+                min(i + chunk_size, len(triplets)),
+                len(triplets),
+                n_obs,
+            )
         invalidate_map_cache()
-        return {"provider": "NRCS", "stations": n_stations, "observations": n_obs}
+        return {
+            "provider": "NRCS",
+            "network": "SNTL",
+            "stations": n_stations,
+            "triplets": len(triplets),
+            "hours": hours,
+            "observations": n_obs,
+        }
     finally:
         provider.close()
         db.close()
+
+
+def ingest_nrcs_backfill(*, max_stations: int | None = None) -> dict:
+    """One-time / on-demand 7-day SNTL observation backfill from AWDB."""
+    return ingest_nrcs(hours=168, max_stations=max_stations, refresh_stations=False)
 
 
 def ingest_bc_asws(*, hours: int = 72) -> dict:
@@ -148,12 +225,12 @@ def ingest_bc_asws(*, hours: int = 72) -> dict:
 
 
 def ingest_all() -> dict:
-    results = {}
-    for name, fn in (("nrcs", ingest_nrcs), ("bc_asws", ingest_bc_asws)):
-        try:
-            results[name] = fn()
-            logger.info("Ingest %s ok: %s", name, results[name])
-        except Exception as exc:  # noqa: BLE001 — keep other providers running
-            logger.exception("Ingest %s failed", name)
-            results[name] = {"error": str(exc)}
+    """Hourly job: NRCS/SNTL last 48h (upsert). BC deferred until networking is reliable."""
+    results: dict = {}
+    try:
+        results["nrcs"] = ingest_nrcs(hours=48, max_stations=None)
+        logger.info("Ingest nrcs ok: %s", results["nrcs"])
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("Ingest nrcs failed")
+        results["nrcs"] = {"error": str(exc)}
     return results

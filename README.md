@@ -15,11 +15,19 @@ docker compose up --build
 - OpenAPI docs: http://localhost:8000/docs
 - Health: http://localhost:8000/health
 
-Trigger an ingest manually (inside the API or worker container):
+Trigger an ingest manually (inside the worker container):
 
 ```bash
-docker compose exec celery-worker python -c "from worker.ingest import ingest_all; print(ingest_all())"
+# Hourly-style pull (last 48h, all SNTL) — same as celery-beat
+podman-compose exec celery-worker \
+  python -c "from worker.ingest import ingest_all; print(ingest_all())"
+
+# One-time 7-day SNTL backfill from AWDB REST, then rely on hourly upserts
+podman-compose exec celery-worker \
+  python -c "from worker.ingest import ingest_nrcs_backfill; print(ingest_nrcs_backfill())"
 ```
+
+(`docker compose exec ...` works the same if you use Docker instead of Podman.)
 
 ## Example endpoints
 
@@ -53,12 +61,12 @@ pytest
 
 ## Phase 1 providers
 
-| Provider | Source |
-|----------|--------|
-| NRCS | USDA AWDB REST (`/stations`, `/data`) |
-| BC ASWS | Province CSVs (`SW/SD/PC/TA.csv`) + seeded station catalog |
+| Provider | Source | Cadence |
+|----------|--------|---------|
+| NRCS SNOTEL (SNTL) | USDA AWDB REST `/stations`, `/data` | Hourly 48h upsert; optional 7-day backfill |
+| BC ASWS | Province CSVs (`SW/SD/PC/TA.csv`) + seeded catalog | Manual for now |
 
-See [docs/architecture.md](docs/architecture.md).
+See [docs/architecture.md](docs/architecture.md) and [docs/providers.md](docs/providers.md).
 
 ## License
 
