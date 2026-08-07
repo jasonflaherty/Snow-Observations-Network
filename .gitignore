@@ -25,3 +25,5 @@ storage/raw/**
 *.log
 .coverage
 htmlcov/
+celerybeat-schedule
+celerybeat-schedule.*

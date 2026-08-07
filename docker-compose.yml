@@ -26,6 +26,7 @@ services:
       retries: 10
 
   api:
+    image: localhost/son:local
     build: .
     command: >
       sh -c "alembic upgrade head &&
@@ -50,7 +51,7 @@ services:
         condition: service_healthy
 
   celery-worker:
-    build: .
+    image: localhost/son:local
     command: celery -A worker.celery_app worker --loglevel=INFO
     env_file:
       - .env
@@ -70,7 +71,7 @@ services:
         condition: service_healthy
 
   celery-beat:
-    build: .
+    image: localhost/son:local
     command: celery -A worker.celery_app beat --loglevel=INFO
     env_file:
       - .env
