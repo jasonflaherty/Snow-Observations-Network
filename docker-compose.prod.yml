@@ -1,0 +1,137 @@
+# Lean production stack for a ~2GB VPS (e.g. NixiHost KVM).
+# Usage:
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Set SON_DOMAIN in .env (e.g. api.yourdomain.com). Postgres/Redis stay internal.
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-son}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-son}
+    command:
+      - postgres
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - work_mem=4MB
+      - -c
+      - maintenance_work_mem=64MB
+      - -c
+      - effective_cache_size=512MB
+      - -c
+      - max_connections=50
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-son} -d ${POSTGRES_DB:-son}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    mem_limit: 512m
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    mem_limit: 96m
+
+  api:
+    image: ${SON_IMAGE:-son:prod}
+    build: .
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 1"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-son}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-son}
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      RAW_STORAGE_PATH: /data/raw
+    volumes:
+      - rawdata:/data/raw
+    expose:
+      - "8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 256m
+
+  celery-worker:
+    image: ${SON_IMAGE:-son:prod}
+    build: .
+    command: celery -A worker.celery_app worker --loglevel=INFO --concurrency=1
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-son}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-son}
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      RAW_STORAGE_PATH: /data/raw
+    volumes:
+      - rawdata:/data/raw
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 512m
+
+  celery-beat:
+    image: ${SON_IMAGE:-son:prod}
+    build: .
+    command: celery -A worker.celery_app beat --loglevel=INFO
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-son}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-son}
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      RAW_STORAGE_PATH: /data/raw
+    volumes:
+      - rawdata:/data/raw
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 128m
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SON_DOMAIN: ${SON_DOMAIN:?set SON_DOMAIN in .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+    restart: unless-stopped
+    mem_limit: 64m
+
+volumes:
+  pgdata:
+  rawdata:
+  caddy_data:
+  caddy_config:

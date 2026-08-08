@@ -72,6 +72,14 @@ pytest
 
 See [docs/architecture.md](docs/architecture.md) and [docs/providers.md](docs/providers.md).
 
+## Production (NixiHost 2GB VPS)
+
+See [deploy/nixihost.md](deploy/nixihost.md):
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
