@@ -74,10 +74,12 @@ See [docs/architecture.md](docs/architecture.md) and [docs/providers.md](docs/pr
 
 ## Production (NixiHost 2GB VPS)
 
-See [deploy/nixihost.md](deploy/nixihost.md):
+See [deploy/nixihost.md](deploy/nixihost.md) for first-time install and **GitHub → VPS** deploys (Actions + `deploy/deploy.sh`):
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
+# later updates on the box:
+DEPLOY_REF=feat/phase-1-foundation ./deploy/deploy.sh
 ```
 
 ## License

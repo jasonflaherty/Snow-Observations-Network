@@ -108,9 +108,67 @@ Examples:
 - `GET /v1/stations/SON-CA-BCASWS-2F05P/current`
 - Docs: `https://api.yourdomain.com/docs`
 
+## 7. Deploy from GitHub (recommended)
+
+After the first manual install above, push-to-deploy via GitHub Actions.
+
+### One-time: SSH key for Actions
+
+On your **laptop** (not the VPS):
+
+```bash
+ssh-keygen -t ed25519 -C "son-github-deploy" -f ~/.ssh/son_vps_deploy -N ""
+```
+
+On the **VPS** (as root):
+
+```bash
+mkdir -p /root/.ssh
+chmod 700 /root/.ssh
+echo 'PASTE_CONTENTS_OF_son_vps_deploy.pub_HERE' >> /root/.ssh/authorized_keys
+chmod 600 /root/.ssh/authorized_keys
+```
+
+Confirm login works:
+
+```bash
+ssh -i ~/.ssh/son_vps_deploy root@YOUR_VPS_IP
+```
+
+### One-time: GitHub secrets
+
+Repo → **Settings → Secrets and variables → Actions → New repository secret**:
+
+| Secret | Value |
+|--------|--------|
+| `VPS_HOST` | VPS IPv4 (or hostname) |
+| `VPS_USER` | `root` |
+| `VPS_SSH_KEY` | Full contents of `~/.ssh/son_vps_deploy` (private key) |
+| `VPS_APP_PATH` | `/opt/son` (optional; this is the default) |
+| `VPS_PORT` | `22` (optional) |
+
+### How deploys run
+
+- **Automatic:** push to `feat/phase-1-foundation` or `main` (markdown-only pushes skipped)
+- **Manual:** Actions → **Deploy VPS** → Run workflow → pick ref
+
+The workflow SSHs in and runs `deploy/deploy.sh`, which:
+
+1. `git fetch` / checkout / `pull --ff-only`
+2. `docker compose -f docker-compose.prod.yml up -d --build`
+3. Hits `/health`
+
+`.env` on the VPS is **not** in git and is never overwritten by deploy.
+
+### Manual deploy on the box (same script)
+
+```bash
+cd /opt/son
+DEPLOY_REF=feat/phase-1-foundation ./deploy/deploy.sh
+```
+
 ## Ops notes
 
-- **Updates:** `cd /opt/son && git pull && docker compose -f docker-compose.prod.yml up -d --build`
 - **Logs:** `docker compose -f docker-compose.prod.yml logs -f api celery-worker`
 - **Disk:** raw AWDB/CSV archives live in the `rawdata` volume — prune later if storage is tight
 - **CORS:** not enabled yet; native/mobile apps are fine. Browser apps need CORS or a same-origin proxy
@@ -123,7 +181,10 @@ Examples:
 - [ ] Swap enabled
 - [ ] Docker installed
 - [ ] `.env` secrets + `SON_DOMAIN`
-- [ ] `compose ... up -d --build`
+- [ ] First `compose ... up -d --build`
 - [ ] `/health` over HTTPS
 - [ ] BC + NRCS backfill
+- [ ] GitHub Actions secrets (`VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`)
+- [ ] Deploy key in VPS `authorized_keys`
+- [ ] Test Actions → Deploy VPS
 - [ ] App pointed at the public API URL
