@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Run on the VPS (manually or via GitHub Actions SSH).
-# Usage: DEPLOY_REF=feat/phase-1-foundation ./deploy/deploy.sh
+# Usage: DEPLOY_REF=main ./deploy/deploy.sh
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-REF="${DEPLOY_REF:-feat/phase-1-foundation}"
+REF="${DEPLOY_REF:-main}"
 COMPOSE=(docker compose -f docker-compose.prod.yml)
 
 echo "==> Deploying SON at $ROOT (ref=$REF)"

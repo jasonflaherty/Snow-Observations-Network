@@ -50,7 +50,7 @@ ufw --force enable
 mkdir -p /opt && cd /opt
 git clone https://github.com/jasonflaherty/Snow-Observations-Network.git son
 cd son
-git checkout feat/phase-1-foundation   # or main once merged
+git checkout main   # production deploy branch
 
 cp .env.example .env
 # edit .env — see below
@@ -149,12 +149,12 @@ Repo → **Settings → Secrets and variables → Actions → New repository sec
 
 ### How deploys run
 
-- **Automatic:** push to `feat/phase-1-foundation` or `main` (markdown-only pushes skipped)
-- **Manual:** Actions → **Deploy VPS** → Run workflow → pick ref
+- **Automatic:** push to `main` only (markdown-only pushes skipped)
+- **Manual:** Actions → **Deploy VPS** → Run workflow (always deploys `main`)
 
 The workflow SSHs in and runs `deploy/deploy.sh`, which:
 
-1. `git fetch` / checkout / `pull --ff-only`
+1. `git fetch` / checkout / `pull --ff-only` on `main`
 2. `docker compose -f docker-compose.prod.yml up -d --build`
 3. Hits `/health`
 
@@ -164,7 +164,7 @@ The workflow SSHs in and runs `deploy/deploy.sh`, which:
 
 ```bash
 cd /opt/son
-DEPLOY_REF=feat/phase-1-foundation ./deploy/deploy.sh
+DEPLOY_REF=main ./deploy/deploy.sh
 ```
 
 ## Ops notes

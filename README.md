@@ -79,8 +79,10 @@ See [deploy/nixihost.md](deploy/nixihost.md) for first-time install and **GitHub
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
 # later updates on the box:
-DEPLOY_REF=feat/phase-1-foundation ./deploy/deploy.sh
+DEPLOY_REF=main ./deploy/deploy.sh
 ```
+
+Pushes to `main` (or Actions → Deploy VPS) deploy to the VPS. Feature branches do not.
 
 ## License
 

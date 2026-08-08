@@ -2,14 +2,8 @@ name: Deploy VPS
 
 on:
   workflow_dispatch:
-    inputs:
-      ref:
-        description: "Git ref to deploy (branch or tag)"
-        required: true
-        default: "feat/phase-1-foundation"
   push:
     branches:
-      - feat/phase-1-foundation
       - main
     paths-ignore:
       - "**/*.md"
@@ -39,10 +33,6 @@ jobs:
             set -euo pipefail
             APP_PATH="${{ secrets.VPS_APP_PATH }}"
             cd "${APP_PATH:-/opt/son}"
-            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-              export DEPLOY_REF="${{ github.event.inputs.ref }}"
-            else
-              export DEPLOY_REF="${{ github.ref_name }}"
-            fi
+            export DEPLOY_REF=main
             chmod +x deploy/deploy.sh
             ./deploy/deploy.sh
