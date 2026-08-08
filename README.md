@@ -25,6 +25,10 @@ podman-compose exec celery-worker \
 # One-time 7-day SNTL backfill from AWDB REST, then rely on hourly upserts
 podman-compose exec celery-worker \
   python -c "from worker.ingest import ingest_nrcs_backfill; print(ingest_nrcs_backfill())"
+
+# One-time 7-day BC ASWS backfill from province CSVs
+podman-compose exec celery-worker \
+  python -c "from worker.ingest import ingest_bc_asws_backfill; print(ingest_bc_asws_backfill())"
 ```
 
 (`docker compose exec ...` works the same if you use Docker instead of Podman.)
@@ -64,7 +68,7 @@ pytest
 | Provider | Source | Cadence |
 |----------|--------|---------|
 | NRCS SNOTEL (SNTL) | USDA AWDB REST `/stations`, `/data` | Hourly 48h upsert; optional 7-day backfill |
-| BC ASWS | Province CSVs (`SW/SD/PC/TA.csv`) + seeded catalog | Manual for now |
+| BC ASWS | Province CSVs (`SW/SD/PC/TA.csv`) + seeded catalog | Hourly 48h upsert; optional 7-day backfill |
 
 See [docs/architecture.md](docs/architecture.md) and [docs/providers.md](docs/providers.md).
 

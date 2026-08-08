@@ -207,7 +207,12 @@ def ingest_nrcs_backfill(*, max_stations: int | None = None) -> dict:
     return ingest_nrcs(hours=168, max_stations=max_stations, refresh_stations=False)
 
 
-def ingest_bc_asws(*, hours: int = 72) -> dict:
+def ingest_bc_asws(*, hours: int = 48) -> dict:
+    """Ingest BC ASWS hourly CSVs (SW/SD/PC/TA), upsert last ``hours``.
+
+    Province files already contain the water-year series; we filter locally.
+    Hourly cadence uses hours=48. Use ``ingest_bc_asws_backfill`` for 7 days.
+    """
     provider = BcAswsProvider()
     db = SessionLocal()
     try:
@@ -218,14 +223,24 @@ def ingest_bc_asws(*, hours: int = 72) -> dict:
         observations = provider.get_observations(start=start, end=end)
         n_obs = upsert_observations(db, observations)
         invalidate_map_cache()
-        return {"provider": "BCASWS", "stations": n_stations, "observations": n_obs}
+        return {
+            "provider": "BCASWS",
+            "stations": n_stations,
+            "hours": hours,
+            "observations": n_obs,
+        }
     finally:
         provider.close()
         db.close()
 
 
+def ingest_bc_asws_backfill(*, hours: int = 168) -> dict:
+    """On-demand BC ASWS observation backfill (default 7 days)."""
+    return ingest_bc_asws(hours=hours)
+
+
 def ingest_all() -> dict:
-    """Hourly job: NRCS/SNTL last 48h (upsert). BC deferred until networking is reliable."""
+    """Hourly job: NRCS/SNTL + BC ASWS last 48h (upsert)."""
     results: dict = {}
     try:
         results["nrcs"] = ingest_nrcs(hours=48, max_stations=None)
@@ -233,4 +248,10 @@ def ingest_all() -> dict:
     except Exception as exc:  # noqa: BLE001
         logger.exception("Ingest nrcs failed")
         results["nrcs"] = {"error": str(exc)}
+    try:
+        results["bc_asws"] = ingest_bc_asws(hours=48)
+        logger.info("Ingest bc_asws ok: %s", results["bc_asws"])
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("Ingest bc_asws failed")
+        results["bc_asws"] = {"error": str(exc)}
     return results

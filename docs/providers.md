@@ -22,4 +22,6 @@ Observation pull params: `duration=HOURLY`, `elements=WTEQ,SNWD,TOBS,PREC`, batc
 - Live CSVs: `https://www.env.gov.bc.ca/wsd/data_searches/snow/asws/data/{SW,SD,PC,TA}.csv`
 - Requires a browser-like `User-Agent` (`SON_USER_AGENT`)
 - Station catalog: `providers/bc_asws/stations_seed.json` (seeded from SnoTel Mapper’s BC catalog; refresh from DataBC WFS when updating)
-- Currently **not** in the hourly `ingest_all` path (DNS/network reliability); call `ingest_bc_asws()` manually when ready
+- **Hourly job:** last **48 hours** (CSV already holds water-year history; filter locally, upsert)
+- **7-day backfill:** `ingest_bc_asws_backfill()` → last **168 hours**
+- Station IDs: `SON-CA-BCASWS-{CODE}` (e.g. `SON-CA-BCASWS-2F05P`)
