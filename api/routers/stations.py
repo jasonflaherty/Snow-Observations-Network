@@ -6,7 +6,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from api.schemas import ObservationOut, StationListOut, StationOut
+from api.schemas import (
+    CurrentObservationOut,
+    ObservationOut,
+    StationListOut,
+    StationOut,
+)
 from database.models import Observation, Station
 from database.session import get_db
 
@@ -26,6 +31,24 @@ def _to_station(st: Station) -> StationOut:
         country=st.country,
         region=st.region,
         active=st.active,
+    )
+
+
+def _to_current(st: Station, obs: Observation) -> CurrentObservationOut:
+    return CurrentObservationOut(
+        station_id=st.id,
+        name=st.name,
+        provider=st.provider_id,
+        station_code=st.station_code,
+        timestamp=obs.timestamp,
+        swe_mm=obs.swe_mm,
+        snow_depth_cm=obs.snow_depth_cm,
+        snowfall_cm=obs.snowfall_cm,
+        temperature_c=obs.temperature_c,
+        precipitation_mm=obs.precipitation_mm,
+        wind_speed_ms=obs.wind_speed_ms,
+        humidity=obs.humidity,
+        quality_flag=obs.quality_flag,
     )
 
 
@@ -89,9 +112,10 @@ def get_station(station_id: str, db: Session = Depends(get_db)) -> StationOut:
     return _to_station(st)
 
 
-@router.get("/stations/{station_id}/current", response_model=ObservationOut)
-def get_current(station_id: str, db: Session = Depends(get_db)) -> ObservationOut:
-    if not db.get(Station, station_id):
+@router.get("/stations/{station_id}/current", response_model=CurrentObservationOut)
+def get_current(station_id: str, db: Session = Depends(get_db)) -> CurrentObservationOut:
+    st = db.get(Station, station_id)
+    if not st:
         raise HTTPException(status_code=404, detail="Station not found")
     obs = db.scalars(
         select(Observation)
@@ -101,7 +125,7 @@ def get_current(station_id: str, db: Session = Depends(get_db)) -> ObservationOu
     ).first()
     if not obs:
         raise HTTPException(status_code=404, detail="No observations")
-    return ObservationOut.model_validate(obs)
+    return _to_current(st, obs)
 
 
 @router.get("/stations/{station_id}/observations", response_model=list[ObservationOut])

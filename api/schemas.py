@@ -35,6 +35,15 @@ class ObservationOut(BaseModel):
     quality_flag: str | None = None
 
 
+class CurrentObservationOut(ObservationOut):
+    """Latest reading with station identity for app convenience."""
+
+    station_id: str
+    name: str
+    provider: str
+    station_code: str
+
+
 class StationListOut(BaseModel):
     items: list[StationOut]
     total: int
