@@ -1,0 +1,38 @@
+name: Deploy VPS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "LICENSE"
+
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: SSH deploy to NixiHost VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script_stop: true
+          command_timeout: 40m
+          script: |
+            set -euo pipefail
+            APP_PATH="${{ secrets.VPS_APP_PATH }}"
+            cd "${APP_PATH:-/opt/son}"
+            export DEPLOY_REF=main
+            chmod +x deploy/deploy.sh
+            ./deploy/deploy.sh
