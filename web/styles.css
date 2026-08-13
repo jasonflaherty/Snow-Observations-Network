@@ -11,6 +11,13 @@
   --danger: #8b3a2f;
   --font-display: "Fraunces", Georgia, serif;
   --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  /* Layer marker hues — same family per type, high contrast between types */
+  --layer-sntl: #00a8c4;
+  --layer-bcasws: #1f8a4c;
+  --layer-scan: #e0a100;
+  --layer-mstl: #4f6fd8;
+  --layer-jma: #c45d2c;
+  --layer-other: #6b7280;
 }
 
 *,
@@ -172,27 +179,27 @@ body {
 }
 
 .filter-swatch--sntl {
-  background: #6f9ea8;
+  background: var(--layer-sntl);
 }
 
 .filter-swatch--bcasws {
-  background: #3d7a5c;
+  background: var(--layer-bcasws);
 }
 
 .filter-swatch--scan {
-  background: #c4a35a;
+  background: var(--layer-scan);
 }
 
 .filter-swatch--mstl {
-  background: #7a8f9e;
+  background: var(--layer-mstl);
 }
 
 .filter-swatch--jma {
-  background: #8a6b4a;
+  background: var(--layer-jma);
 }
 
 .filter-swatch--other {
-  background: #5a6570;
+  background: var(--layer-other);
 }
 
 .filter-count {
@@ -234,27 +241,27 @@ body {
 }
 
 .son-marker--sntl {
-  background: #6f9ea8;
+  background: var(--layer-sntl);
 }
 
 .son-marker--bcasws {
-  background: #3d7a5c;
+  background: var(--layer-bcasws);
 }
 
 .son-marker--scan {
-  background: #c4a35a;
+  background: var(--layer-scan);
 }
 
 .son-marker--mstl {
-  background: #7a8f9e;
+  background: var(--layer-mstl);
 }
 
 .son-marker--jma {
-  background: #8a6b4a;
+  background: var(--layer-jma);
 }
 
 .son-marker--other {
-  background: #5a6570;
+  background: var(--layer-other);
 }
 
 .son-marker:hover,
