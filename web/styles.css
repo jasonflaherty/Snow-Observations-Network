@@ -114,6 +114,86 @@ body {
   color: #f4f8f7;
 }
 
+.filters {
+  position: absolute;
+  z-index: 500;
+  top: 7.5rem;
+  left: 1.5rem;
+  width: min(15rem, calc(100vw - 2rem));
+  padding: 0.85rem 1rem 1rem;
+  background: rgba(248, 251, 252, 0.94);
+  border: 1px solid rgba(20, 32, 28, 0.1);
+  border-radius: 4px;
+  backdrop-filter: blur(10px);
+  animation: rise 0.7s ease-out 0.2s both;
+  pointer-events: auto;
+}
+
+.filters__title {
+  margin: 0 0 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.filters__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--ink);
+  user-select: none;
+}
+
+.filter-row input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--pine);
+  cursor: pointer;
+}
+
+.filter-swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  border: 1.5px solid #f4f8f7;
+  box-shadow: 0 0 0 2px var(--glow);
+  flex-shrink: 0;
+}
+
+.filter-swatch--nrcs {
+  background: #6f9ea8;
+}
+
+.filter-swatch--bcasws {
+  background: #3d7a5c;
+}
+
+.filter-swatch--jma {
+  background: #8a6b4a;
+}
+
+.filter-swatch--other {
+  background: #5a6570;
+}
+
+.filter-count {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
 .map {
   position: absolute;
   inset: 0;
@@ -155,6 +235,10 @@ body {
 
 .son-marker--jma {
   background: #8a6b4a;
+}
+
+.son-marker--other {
+  background: #5a6570;
 }
 
 .son-marker:hover,
@@ -333,5 +417,13 @@ body {
 
   .status {
     text-align: left;
+  }
+
+  .filters {
+    top: auto;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    width: auto;
   }
 }
