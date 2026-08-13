@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.middleware.rate_limit import RateLimitMiddleware
 from api.routers import map as map_router
 from api.routers import stations as stations_router
+from son_core import __version__
 from son_core.config import get_settings
 
 settings = get_settings()
@@ -11,7 +12,7 @@ cors_origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()
 
 app = FastAPI(
     title="Snow Observations Network API",
-    version="0.1.0",
+    version=__version__,
     description="Open standardized API for global snowpack observations.",
 )
 
@@ -29,4 +30,4 @@ app.include_router(map_router.router)
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "service": "son-api"}
+    return {"status": "ok", "service": "son-api", "version": __version__}

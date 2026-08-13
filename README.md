@@ -4,6 +4,17 @@ Free, open, standardized API for global snowpack observations.
 
 SON is a **data platform**: ingest snow observations from multiple providers, normalize units, store them in PostGIS, and expose them through a versioned HTTP API.
 
+## Status
+
+**Release [v1.0.0](https://github.com/jasonflaherty/Snow-Observations-Network/releases/tag/v1.0.0)** — Phase 1 platform is production-ready.
+
+| | |
+|--|--|
+| API | https://api.psithurismlabs.com |
+| OpenAPI | https://api.psithurismlabs.com/docs |
+| Explorer | https://jasonflaherty.github.io/Snow-Observations-Network/ |
+| Changelog | [CHANGELOG.md](CHANGELOG.md) |
+
 ## Quick start
 
 ```bash
