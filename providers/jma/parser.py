@@ -73,6 +73,25 @@ def iter_hourly_jst_stamps(start: datetime, end: datetime) -> list[str]:
     return stamps
 
 
+def iter_daily_jst_stamps(start: datetime, end: datetime) -> list[str]:
+    """One noon-JST stamp per calendar day covering ``[start, end]``."""
+    from datetime import timedelta
+
+    if start.tzinfo is None:
+        start = start.replace(tzinfo=timezone.utc)
+    if end.tzinfo is None:
+        end = end.replace(tzinfo=timezone.utc)
+
+    day = start.astimezone(JST).date()
+    end_day = end.astimezone(JST).date()
+    stamps: list[str] = []
+    while day <= end_day:
+        noon = datetime(day.year, day.month, day.day, 12, 0, 0, tzinfo=JST)
+        stamps.append(noon.strftime("%Y%m%d%H%M%S"))
+        day += timedelta(days=1)
+    return stamps
+
+
 def parse_amedastable(payload: dict[str, Any]) -> list[NormalizedStation]:
     """Parse ``amedastable.json`` into normalized stations (all sites; snow sites active)."""
     stations: list[NormalizedStation] = []

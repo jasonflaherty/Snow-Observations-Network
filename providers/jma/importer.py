@@ -9,6 +9,7 @@ import httpx
 from providers.base import NormalizedObservation, NormalizedStation
 from providers.jma.parser import (
     PROVIDER_ID,
+    iter_daily_jst_stamps,
     iter_hourly_jst_stamps,
     jst_stamp_to_utc,
     parse_amedastable,
@@ -76,6 +77,7 @@ class JmaProvider:
         start: datetime,
         end: datetime,
         station_codes: list[str] | None = None,
+        cadence: str = "hourly",
     ) -> list[NormalizedObservation]:
         snow_codes = self._snow_station_codes()
         if station_codes is not None:
@@ -85,7 +87,14 @@ class JmaProvider:
         if not allow:
             return []
 
-        stamps = iter_hourly_jst_stamps(start, end)
+        cadence = cadence.lower()
+        if cadence == "daily":
+            stamps = iter_daily_jst_stamps(start, end)
+            resolution = "daily"
+        else:
+            stamps = iter_hourly_jst_stamps(start, end)
+            resolution = "hourly"
+
         observations: list[NormalizedObservation] = []
         for stamp in stamps:
             url = MAP_URL.format(stamp=stamp)
@@ -98,7 +107,7 @@ class JmaProvider:
             archive_raw(self.provider_id, f"map_{stamp}.json", resp.text)
             payload: dict[str, Any] = resp.json()
             ts = jst_stamp_to_utc(stamp)
-            observations.extend(
-                parse_map_json(payload, timestamp=ts, station_codes=allow)
-            )
+            for obs in parse_map_json(payload, timestamp=ts, station_codes=allow):
+                obs.resolution = resolution
+                observations.append(obs)
         return observations

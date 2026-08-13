@@ -26,6 +26,16 @@ Examples:
 
 Provider triplets are stored as `external_id` for client migration (`301:CA:SNTL`, `2F05P:BC:ASWS`). JMA uses the AMeDAS station code as `external_id`.
 
+## Observation history
+
+| Tier | Window | Notes |
+|------|--------|-------|
+| Hourly | Past 72 hours | Pruned after ingest |
+| Daily | Past 7 days (ongoing) | NRCS AWDB daily; BC/JMA last-of-day |
+| Daily lookback | Up to 1 year | `ingest_nrcs_daily_backfill` / BC CSV daily |
+
+Rows are unique on `(station_id, timestamp, resolution)`. Query with `?resolution=hourly|daily`.
+
 ## Units
 
 API and database use metric:

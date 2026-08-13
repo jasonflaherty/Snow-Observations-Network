@@ -25,6 +25,7 @@ class ObservationOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     timestamp: datetime
+    resolution: str = "hourly"
     swe_mm: float | None = None
     snow_depth_cm: float | None = None
     snowfall_cm: float | None = None

@@ -63,8 +63,18 @@ class Station(Base):
 class Observation(Base):
     __tablename__ = "observations"
     __table_args__ = (
-        UniqueConstraint("station_id", "timestamp", name="uq_station_timestamp"),
-        Index("ix_observations_station_ts_desc", "station_id", "timestamp"),
+        UniqueConstraint(
+            "station_id",
+            "timestamp",
+            "resolution",
+            name="uq_station_timestamp_resolution",
+        ),
+        Index(
+            "ix_observations_station_resolution_ts",
+            "station_id",
+            "resolution",
+            "timestamp",
+        ),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -72,6 +82,7 @@ class Observation(Base):
         String(64), ForeignKey("stations.id"), nullable=False, index=True
     )
     timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    resolution: Mapped[str] = mapped_column(String(16), nullable=False, default="hourly")
     swe_mm: Mapped[float | None] = mapped_column(Float, nullable=True)
     snow_depth_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
     snowfall_cm: Mapped[float | None] = mapped_column(Float, nullable=True)

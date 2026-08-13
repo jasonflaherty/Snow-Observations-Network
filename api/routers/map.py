@@ -31,10 +31,20 @@ def map_stations(db: Session = Depends(get_db)) -> dict:
     for st in stations:
         obs = db.scalars(
             select(Observation)
-            .where(Observation.station_id == st.id)
+            .where(
+                Observation.station_id == st.id,
+                Observation.resolution == "hourly",
+            )
             .order_by(Observation.timestamp.desc())
             .limit(1)
         ).first()
+        if not obs:
+            obs = db.scalars(
+                select(Observation)
+                .where(Observation.station_id == st.id)
+                .order_by(Observation.timestamp.desc())
+                .limit(1)
+            ).first()
         features.append(
             {
                 "type": "Feature",

@@ -89,6 +89,7 @@ class NrcsProvider:
         end: datetime,
         station_codes: list[str] | None = None,
         station_triplets: list[str] | None = None,
+        duration: str = "HOURLY",
     ) -> list[NormalizedObservation]:
         if not station_triplets and not station_codes:
             return []
@@ -98,11 +99,19 @@ class NrcsProvider:
         if not triplets:
             return []
 
+        duration = duration.upper()
+        if duration not in {"HOURLY", "DAILY"}:
+            raise ValueError("duration must be HOURLY or DAILY")
+
         observations: list[NormalizedObservation] = []
         batch_size = self.batch_size
         for i in range(0, len(triplets), batch_size):
             batch = triplets[i : i + batch_size]
-            observations.extend(self._fetch_data_batch(batch, start=start, end=end))
+            observations.extend(
+                self._fetch_data_batch(
+                    batch, start=start, end=end, duration=duration
+                )
+            )
         return observations
 
     def _fetch_data_batch(
@@ -111,14 +120,15 @@ class NrcsProvider:
         *,
         start: datetime,
         end: datetime,
+        duration: str = "HOURLY",
     ) -> list[NormalizedObservation]:
         """Fetch one AWDB batch; on 5xx, split the batch or skip a single bad station."""
         if not batch:
             return []
         params = {
-            "beginDate": _fmt(start),
-            "endDate": _fmt(end),
-            "duration": "HOURLY",
+            "beginDate": _fmt(start, daily=(duration == "DAILY")),
+            "endDate": _fmt(end, daily=(duration == "DAILY")),
+            "duration": duration,
             "elements": "WTEQ,SNWD,TOBS,PREC",
             "stationTriplets": ",".join(batch),
             "periodRef": "START",
@@ -135,8 +145,10 @@ class NrcsProvider:
                     "AWDB %s for %d stations; splitting batch", status, len(batch)
                 )
                 return self._fetch_data_batch(
-                    batch[:mid], start=start, end=end
-                ) + self._fetch_data_batch(batch[mid:], start=start, end=end)
+                    batch[:mid], start=start, end=end, duration=duration
+                ) + self._fetch_data_batch(
+                    batch[mid:], start=start, end=end, duration=duration
+                )
             if status >= 500 and len(batch) == 1:
                 logger.warning("AWDB %s for station %s; skipping", status, batch[0])
                 return []
@@ -146,23 +158,35 @@ class NrcsProvider:
                 mid = len(batch) // 2
                 logger.warning("AWDB timeout for %d stations; splitting", len(batch))
                 return self._fetch_data_batch(
-                    batch[:mid], start=start, end=end
-                ) + self._fetch_data_batch(batch[mid:], start=start, end=end)
+                    batch[:mid], start=start, end=end, duration=duration
+                ) + self._fetch_data_batch(
+                    batch[mid:], start=start, end=end, duration=duration
+                )
             logger.warning("AWDB timeout for station %s; skipping", batch[0])
             return []
 
         stamp = datetime.now(timezone.utc).strftime("%H%M%S")
-        archive_raw(self.provider_id, f"data_{stamp}_{batch[0].replace(':', '_')}.json", resp.text)
-        return _parse_awdb_data(resp.json())
+        archive_raw(
+            self.provider_id,
+            f"data_{duration.lower()}_{stamp}_{batch[0].replace(':', '_')}.json",
+            resp.text,
+        )
+        resolution = "daily" if duration == "DAILY" else "hourly"
+        return _parse_awdb_data(resp.json(), resolution=resolution)
 
 
-def _fmt(dt: datetime) -> str:
+def _fmt(dt: datetime, *, daily: bool = False) -> str:
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
-    return dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M")
+    utc = dt.astimezone(timezone.utc)
+    if daily:
+        return utc.strftime("%Y-%m-%d")
+    return utc.strftime("%Y-%m-%d %H:%M")
 
 
-def _parse_awdb_data(payload: Any) -> list[NormalizedObservation]:
+def _parse_awdb_data(
+    payload: Any, *, resolution: str = "hourly"
+) -> list[NormalizedObservation]:
     """Parse AWDB /data JSON into metric NormalizedObservation rows."""
     by_key: dict[tuple[str, datetime], NormalizedObservation] = {}
 
@@ -194,6 +218,7 @@ def _parse_awdb_data(payload: Any) -> list[NormalizedObservation]:
                         provider_id="NRCS",
                         station_code=station_code,
                         timestamp=ts,
+                        resolution=resolution,
                     )
                     by_key[key] = obs
                 _apply_element(obs, code, unit, num)
@@ -225,5 +250,5 @@ def _parse_ts(value: Any) -> datetime | None:
     return None
 
 
-def parse_awdb_data_json(text: str) -> list[NormalizedObservation]:
-    return _parse_awdb_data(json.loads(text))
+def parse_awdb_data_json(text: str, *, resolution: str = "hourly") -> list[NormalizedObservation]:
+    return _parse_awdb_data(json.loads(text), resolution=resolution)

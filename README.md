@@ -18,31 +18,42 @@ docker compose up --build
 Trigger an ingest manually (inside the worker container):
 
 ```bash
-# Hourly-style pull (last 48h, all SNTL) — same as celery-beat
+# Hourly job (72h hourly + 7d daily + prune) — same as celery-beat
 podman-compose exec celery-worker \
   python -c "from worker.ingest import ingest_all; print(ingest_all())"
 
-# One-time 7-day SNTL backfill from AWDB REST, then rely on hourly upserts
+# One-time NRCS daily year lookback (SNTL) — heavy on a small VPS; use tmux
 podman-compose exec celery-worker \
-  python -c "from worker.ingest import ingest_nrcs_backfill; print(ingest_nrcs_backfill())"
+  python -c "from worker.ingest import ingest_nrcs_daily_backfill; print(ingest_nrcs_daily_backfill())"
 
-# One-time 7-day BC ASWS backfill from province CSVs
+# Optional BC daily year lookback from water-year CSVs
 podman-compose exec celery-worker \
-  python -c "from worker.ingest import ingest_bc_asws_backfill; print(ingest_bc_asws_backfill())"
-
-# One-time 7-day JMA AMeDAS backfill from Bosai map JSON
-podman-compose exec celery-worker \
-  python -c "from worker.ingest import ingest_jma_backfill; print(ingest_jma_backfill())"
+  python -c "from worker.ingest import ingest_bc_asws_daily_backfill; print(ingest_bc_asws_daily_backfill())"
 ```
 
 (`docker compose exec ...` works the same if you use Docker instead of Podman.)
+
+## History tiers
+
+| Resolution | Retention | How |
+|------------|-----------|-----|
+| `hourly` | Past **72 hours** | Celery ingest; older hourly rows pruned |
+| `daily` | Past **7 days** ongoing; up to **1 year** after backfill | NRCS AWDB daily; BC/JMA last-of-day from hourly sources |
+
+```bash
+# Last 72h hourly
+curl "http://localhost:8000/v1/stations/SON-US-NRCS-301/observations?resolution=hourly&limit=100"
+
+# Last week / year daily
+curl "http://localhost:8000/v1/stations/SON-US-NRCS-301/observations?resolution=daily&limit=400"
+```
 
 ## Example endpoints
 
 ```bash
 curl http://localhost:8000/v1/stations
 curl http://localhost:8000/v1/stations/SON-CA-BCASWS-1A01P/current
-curl "http://localhost:8000/v1/stations/SON-US-NRCS-301/observations?limit=100"
+curl "http://localhost:8000/v1/stations/SON-US-NRCS-301/observations?resolution=hourly&limit=100"
 curl "http://localhost:8000/v1/stations?country=JP"
 curl http://localhost:8000/v1/map/stations
 ```
@@ -72,9 +83,9 @@ pytest
 
 | Provider | Source | Cadence |
 |----------|--------|---------|
-| NRCS SNOTEL (SNTL) | USDA AWDB REST `/stations`, `/data` | Hourly 48h upsert; optional 7-day backfill |
-| BC ASWS | Province CSVs (`SW/SD/PC/TA.csv`) + seeded catalog | Hourly 48h upsert; optional 7-day backfill |
-| JMA AMeDAS | Bosai JSON `amedastable` + hourly `map/{stamp}.json` | Hourly 48h upsert; optional 7-day backfill |
+| NRCS SNOTEL (SNTL) | USDA AWDB REST `/stations`, `/data` | Hourly 72h + daily 7d; optional 1y daily backfill |
+| BC ASWS | Province CSVs (`SW/SD/PC/TA.csv`) + seeded catalog | Hourly 72h + daily 7d (last-of-day); optional year daily |
+| JMA AMeDAS | Bosai JSON `amedastable` + hourly `map/{stamp}.json` | Hourly 72h + daily 7d (noon JST) |
 
 See [docs/architecture.md](docs/architecture.md) and [docs/providers.md](docs/providers.md).
 

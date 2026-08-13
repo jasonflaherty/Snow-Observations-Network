@@ -85,16 +85,16 @@ curl -sS "https://${SON_DOMAIN}/health"
 cd /opt/son
 COMPOSE="docker compose -f docker-compose.prod.yml"
 
-# BC is quick (~minutes)
+# BC quick hourly/daily refresh
 $COMPOSE exec celery-worker \
-  python -c "from worker.ingest import ingest_bc_asws_backfill; print(ingest_bc_asws_backfill())"
+  python -c "from worker.ingest import ingest_bc_asws, ingest_bc_asws_daily; print(ingest_bc_asws()); print(ingest_bc_asws_daily())"
 
-# NRCS 7-day SNTL — can take a long time on 2GB; run in tmux/screen
+# NRCS daily year lookback — can take a long time on 2GB; run in tmux/screen
 $COMPOSE exec celery-worker \
-  python -c "from worker.ingest import ingest_nrcs_backfill; print(ingest_nrcs_backfill())"
+  python -c "from worker.ingest import ingest_nrcs_daily_backfill; print(ingest_nrcs_daily_backfill())"
 ```
 
-After that, Celery Beat keeps both providers refreshed hourly at `:05` UTC.
+After that, Celery Beat keeps hourly (72h) + daily (7d) refreshed at `:05` UTC.
 
 ## 6. App base URL
 

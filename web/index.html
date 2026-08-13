@@ -180,6 +180,41 @@
         <p class="modal__id" id="modal-id"></p>
         <p class="modal__observed" id="modal-observed"></p>
         <dl class="readings" id="modal-readings"></dl>
+
+        <section class="history" aria-labelledby="history-heading">
+          <div class="history__head">
+            <h3 class="history__title" id="history-heading">Temp &amp; snow depth</h3>
+            <div class="history__switch" role="group" aria-label="History range">
+              <button
+                type="button"
+                class="history__btn is-active"
+                id="history-72h"
+                aria-pressed="true"
+                data-range="72h"
+              >
+                72 hours
+              </button>
+              <button
+                type="button"
+                class="history__btn"
+                id="history-7d"
+                aria-pressed="false"
+                data-range="7d"
+              >
+                7 days
+              </button>
+            </div>
+          </div>
+          <p class="history__status" id="history-status">Loading history…</p>
+          <div class="history__chart-wrap">
+            <canvas id="history-chart" width="640" height="280" aria-label="Temperature and snow depth chart"></canvas>
+          </div>
+          <ul class="history__legend" aria-hidden="true">
+            <li><span class="history__swatch history__swatch--temp"></span> Temperature</li>
+            <li><span class="history__swatch history__swatch--snow"></span> Snow depth</li>
+          </ul>
+        </section>
+
         <p class="modal__meaning" id="modal-meaning"></p>
         <p class="modal__error" id="modal-error" hidden></p>
         <a class="modal__api" id="modal-api" href="#" target="_blank" rel="noopener"

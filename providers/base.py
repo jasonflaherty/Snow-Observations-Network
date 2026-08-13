@@ -24,6 +24,7 @@ class NormalizedObservation:
     provider_id: str
     station_code: str
     timestamp: datetime
+    resolution: str = "hourly"
     swe_mm: float | None = None
     snow_depth_cm: float | None = None
     snowfall_cm: float | None = None

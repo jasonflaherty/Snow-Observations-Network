@@ -41,6 +41,7 @@ def _to_current(st: Station, obs: Observation) -> CurrentObservationOut:
         provider=st.provider_id,
         station_code=st.station_code,
         timestamp=obs.timestamp,
+        resolution=obs.resolution,
         swe_mm=obs.swe_mm,
         snow_depth_cm=obs.snow_depth_cm,
         snowfall_cm=obs.snowfall_cm,
@@ -117,12 +118,23 @@ def get_current(station_id: str, db: Session = Depends(get_db)) -> CurrentObserv
     st = db.get(Station, station_id)
     if not st:
         raise HTTPException(status_code=404, detail="Station not found")
+    # Prefer latest hourly; fall back to daily if hourly not yet ingested
     obs = db.scalars(
         select(Observation)
-        .where(Observation.station_id == station_id)
+        .where(
+            Observation.station_id == station_id,
+            Observation.resolution == "hourly",
+        )
         .order_by(Observation.timestamp.desc())
         .limit(1)
     ).first()
+    if not obs:
+        obs = db.scalars(
+            select(Observation)
+            .where(Observation.station_id == station_id)
+            .order_by(Observation.timestamp.desc())
+            .limit(1)
+        ).first()
     if not obs:
         raise HTTPException(status_code=404, detail="No observations")
     return _to_current(st, obs)
@@ -133,12 +145,24 @@ def get_observations(
     station_id: str,
     start: datetime | None = None,
     end: datetime | None = None,
+    resolution: str | None = Query(
+        default=None,
+        description="hourly | daily. Omit for both. Hourly retained ~72h; daily up to ~1y.",
+    ),
     limit: int = Query(default=500, ge=1, le=5000),
     db: Session = Depends(get_db),
 ) -> list[ObservationOut]:
     if not db.get(Station, station_id):
         raise HTTPException(status_code=404, detail="Station not found")
+    if resolution is not None:
+        resolution = resolution.lower()
+        if resolution not in {"hourly", "daily"}:
+            raise HTTPException(
+                status_code=400, detail="resolution must be hourly or daily"
+            )
     stmt = select(Observation).where(Observation.station_id == station_id)
+    if resolution:
+        stmt = stmt.where(Observation.resolution == resolution)
     if start:
         stmt = stmt.where(Observation.timestamp >= start)
     if end:
