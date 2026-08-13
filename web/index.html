@@ -60,15 +60,16 @@
       </div>
       <p class="filters__title filters__title--layers">Layers</p>
       <div id="filter-list" class="filters__list"></div>
-      <p class="filters__title filters__title--units">Temperature</p>
-      <div class="unit-toggle" role="group" aria-label="Temperature units">
-        <button type="button" id="unit-c" class="unit-toggle__btn is-active" aria-pressed="true">
-          °C
+      <p class="filters__title filters__title--units">Units</p>
+      <div class="unit-toggle" role="group" aria-label="Display units">
+        <button type="button" id="unit-metric" class="unit-toggle__btn is-active" aria-pressed="true">
+          Metric
         </button>
-        <button type="button" id="unit-f" class="unit-toggle__btn" aria-pressed="false">
-          °F
+        <button type="button" id="unit-us" class="unit-toggle__btn" aria-pressed="false">
+          US
         </button>
       </div>
+      <p class="unit-hint" id="unit-hint">°C · mm · cm · m</p>
     </aside>
 
     <aside class="legend" aria-label="Field legend">
@@ -133,8 +134,8 @@
           </section>
 
           <p class="legend__note">
-            API units are always metric (°C, mm, cm). Use the °C/°F switch for temperature
-            display only.
+            The API always stores metric (°C, mm, cm, m). Use the Metric / US switch to
+            display °F, inches, and feet in the UI.
           </p>
         </div>
       </details>

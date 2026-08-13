@@ -19,8 +19,9 @@
   const filterList = document.getElementById("filter-list");
   const searchInput = document.getElementById("search-input");
   const searchResults = document.getElementById("search-results");
-  const unitCBtn = document.getElementById("unit-c");
-  const unitFBtn = document.getElementById("unit-f");
+  const unitMetricBtn = document.getElementById("unit-metric");
+  const unitUsBtn = document.getElementById("unit-us");
+  const unitHint = document.getElementById("unit-hint");
   const modal = document.getElementById("modal");
   const modalTitle = document.getElementById("modal-title");
   const modalProvider = document.getElementById("modal-provider");
@@ -31,8 +32,15 @@
   const modalMeaning = document.getElementById("modal-meaning");
   const modalApi = document.getElementById("modal-api");
 
-  const TEMP_KEY = "son-temp-unit";
-  let tempUnit = localStorage.getItem(TEMP_KEY) === "F" ? "F" : "C";
+  const UNITS_KEY = "son-display-units";
+  function loadUnitSystem() {
+    const saved = localStorage.getItem(UNITS_KEY);
+    if (saved === "us" || saved === "metric") return saved;
+    // migrate older temp-only preference
+    if (localStorage.getItem("son-temp-unit") === "F") return "us";
+    return "metric";
+  }
+  let unitSystem = loadUnitSystem();
   /** @type {{ props: object, detail: object | null } | null} */
   let modalState = null;
 
@@ -117,26 +125,71 @@
     return (celsius * 9) / 5 + 32;
   }
 
+  function mmToIn(mm) {
+    return mm / 25.4;
+  }
+
+  function cmToIn(cm) {
+    return cm / 2.54;
+  }
+
+  function mToFt(m) {
+    return m / 0.3048;
+  }
+
+  function msToMph(ms) {
+    return ms * 2.23693629;
+  }
+
   function fmtTemp(celsius) {
     if (celsius === null || celsius === undefined || Number.isNaN(Number(celsius))) {
       return "—";
     }
     const c = Number(celsius);
-    if (tempUnit === "F") return fmt(cToF(c), "°F");
+    if (unitSystem === "us") return fmt(cToF(c), "°F");
     return fmt(c, "°C");
   }
 
-  function syncUnitButtons() {
-    const isC = tempUnit === "C";
-    unitCBtn.classList.toggle("is-active", isC);
-    unitFBtn.classList.toggle("is-active", !isC);
-    unitCBtn.setAttribute("aria-pressed", String(isC));
-    unitFBtn.setAttribute("aria-pressed", String(!isC));
+  function fmtMm(mm) {
+    if (mm === null || mm === undefined || Number.isNaN(Number(mm))) return "—";
+    const v = Number(mm);
+    if (unitSystem === "us") return fmt(mmToIn(v), "in");
+    return fmt(v, "mm");
   }
 
-  function setTempUnit(unit) {
-    tempUnit = unit === "F" ? "F" : "C";
-    localStorage.setItem(TEMP_KEY, tempUnit);
+  function fmtCm(cm) {
+    if (cm === null || cm === undefined || Number.isNaN(Number(cm))) return "—";
+    const v = Number(cm);
+    if (unitSystem === "us") return fmt(cmToIn(v), "in");
+    return fmt(v, "cm");
+  }
+
+  function fmtElev(m) {
+    if (m === null || m === undefined || Number.isNaN(Number(m))) return "—";
+    const v = Number(m);
+    if (unitSystem === "us") return fmt(mToFt(v), "ft");
+    return fmt(v, "m");
+  }
+
+  function fmtWind(ms) {
+    if (ms === null || ms === undefined || Number.isNaN(Number(ms))) return "—";
+    const v = Number(ms);
+    if (unitSystem === "us") return fmt(msToMph(v), "mph");
+    return fmt(v, "m/s");
+  }
+
+  function syncUnitButtons() {
+    const isMetric = unitSystem === "metric";
+    unitMetricBtn.classList.toggle("is-active", isMetric);
+    unitUsBtn.classList.toggle("is-active", !isMetric);
+    unitMetricBtn.setAttribute("aria-pressed", String(isMetric));
+    unitUsBtn.setAttribute("aria-pressed", String(!isMetric));
+    unitHint.textContent = isMetric ? "°C · mm · cm · m · m/s" : "°F · in · ft · mph";
+  }
+
+  function setUnitSystem(system) {
+    unitSystem = system === "us" ? "us" : "metric";
+    localStorage.setItem(UNITS_KEY, unitSystem);
     syncUnitButtons();
     if (modalState && !modal.hidden) {
       openModal(modalState.props, modalState.detail);
@@ -192,13 +245,13 @@
     modalObserved.textContent = `Observed ${fmtTime(observed)}`;
 
     setReadings([
-      ["SWE", fmt(detail?.swe_mm ?? props.swe_mm, "mm")],
-      ["Snow depth", fmt(detail?.snow_depth_cm ?? props.snow_depth_cm, "cm")],
-      ["Snowfall", fmt(detail?.snowfall_cm, "cm")],
+      ["SWE", fmtMm(detail?.swe_mm ?? props.swe_mm)],
+      ["Snow depth", fmtCm(detail?.snow_depth_cm ?? props.snow_depth_cm)],
+      ["Snowfall", fmtCm(detail?.snowfall_cm)],
       ["Temperature", fmtTemp(detail?.temperature_c ?? props.temperature_c)],
-      ["Precipitation", fmt(detail?.precipitation_mm, "mm")],
-      ["Elevation", fmt(props.elevation_m, "m")],
-      ["Wind", fmt(detail?.wind_speed_ms, "m/s")],
+      ["Precipitation", fmtMm(detail?.precipitation_mm)],
+      ["Elevation", fmtElev(props.elevation_m)],
+      ["Wind", fmtWind(detail?.wind_speed_ms)],
       ["Humidity", fmt(detail?.humidity, "%")],
     ]);
 
@@ -522,8 +575,8 @@
     if (!e.target.closest(".search")) hideSearchResults();
   });
 
-  unitCBtn.addEventListener("click", () => setTempUnit("C"));
-  unitFBtn.addEventListener("click", () => setTempUnit("F"));
+  unitMetricBtn.addEventListener("click", () => setUnitSystem("metric"));
+  unitUsBtn.addEventListener("click", () => setUnitSystem("us"));
   syncUnitButtons();
 
   async function loadStations() {
