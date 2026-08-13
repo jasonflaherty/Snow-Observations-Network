@@ -39,107 +39,128 @@
           rel="noopener"
           >API</a
         >
+        <button
+          type="button"
+          id="menu-toggle"
+          class="menu-toggle"
+          aria-controls="menu-panel"
+          aria-expanded="false"
+          aria-label="Open menu"
+        >
+          <span class="menu-toggle__bars" aria-hidden="true"></span>
+        </button>
       </div>
     </header>
 
-    <aside class="filters" aria-label="Station layers">
-      <p class="filters__title">Search</p>
-      <div class="search">
-        <input
-          id="search-input"
-          class="search__input"
-          type="search"
-          placeholder="Name or station ID…"
-          autocomplete="off"
-          spellcheck="false"
-          aria-label="Search stations by name or ID"
-          aria-controls="search-results"
-          aria-autocomplete="list"
-        />
-        <ul id="search-results" class="search__results" role="listbox" hidden></ul>
-      </div>
-      <p class="filters__title filters__title--layers">Layers</p>
-      <div id="filter-list" class="filters__list"></div>
-      <p class="filters__title filters__title--units">Units</p>
-      <div class="unit-toggle" role="group" aria-label="Display units">
-        <button type="button" id="unit-metric" class="unit-toggle__btn is-active" aria-pressed="true">
-          Metric
-        </button>
-        <button type="button" id="unit-us" class="unit-toggle__btn" aria-pressed="false">
-          US
+    <div id="menu-backdrop" class="menu-backdrop" hidden></div>
+
+    <div id="menu-panel" class="menu-panel">
+      <div class="menu-panel__head">
+        <p class="menu-panel__title">Menu</p>
+        <button type="button" id="menu-close" class="menu-close" aria-label="Close menu">
+          ×
         </button>
       </div>
-      <p class="unit-hint" id="unit-hint">°C · mm · cm · m</p>
-    </aside>
 
-    <aside class="legend" aria-label="Field legend">
-      <details>
-        <summary class="legend__summary">Field legend</summary>
-        <div class="legend__body">
-          <p class="legend__intro">
-            SON stores metric values from each provider. The same field can mean different
-            things by site type.
-          </p>
-
-          <section class="legend__section">
-            <h3 class="legend__heading">
-              <span class="filter-swatch filter-swatch--sntl" aria-hidden="true"></span>
-              SNOTEL / SCAN / MSTL (NRCS)
-            </h3>
-            <ul class="legend__list">
-              <li><strong>SWE</strong> — snow water equivalent (pillow)</li>
-              <li><strong>Snow depth</strong> — depth at the sensor</li>
-              <li><strong>Temperature</strong> — observed air temp</li>
-              <li>
-                <strong>Precipitation</strong> — water-year
-                <em>accumulation</em> (usually from Oct&nbsp;1), not this hour’s rain
-              </li>
-              <li><strong>Snowfall / wind / humidity</strong> — usually not provided</li>
-            </ul>
-          </section>
-
-          <section class="legend__section">
-            <h3 class="legend__heading">
-              <span class="filter-swatch filter-swatch--bcasws" aria-hidden="true"></span>
-              BC ASWS
-            </h3>
-            <ul class="legend__list">
-              <li><strong>SWE</strong> — snow water equivalent</li>
-              <li><strong>Snow depth</strong> — depth at the pillow</li>
-              <li><strong>Temperature</strong> — air temperature</li>
-              <li>
-                <strong>Precipitation</strong> — seasonal / water-year
-                <em>accumulation</em>, not hourly rainfall
-              </li>
-              <li><strong>Snowfall / wind / humidity</strong> — not in these CSVs</li>
-            </ul>
-          </section>
-
-          <section class="legend__section">
-            <h3 class="legend__heading">
-              <span class="filter-swatch filter-swatch--jma" aria-hidden="true"></span>
-              JMA AMeDAS
-            </h3>
-            <ul class="legend__list">
-              <li><strong>SWE</strong> — not available (always blank)</li>
-              <li><strong>Snow depth</strong> — current snow depth</li>
-              <li><strong>Snowfall</strong> — last 1 hour of snowfall</li>
-              <li><strong>Temperature</strong> — air temperature</li>
-              <li>
-                <strong>Precipitation</strong> — last
-                <em>1 hour</em> of rain/melt (not a year total)
-              </li>
-              <li><strong>Wind / humidity</strong> — when reported</li>
-            </ul>
-          </section>
-
-          <p class="legend__note">
-            The API always stores metric (°C, mm, cm, m). Use the Metric / US switch to
-            display °F, inches, and feet in the UI.
-          </p>
+      <aside class="filters" aria-label="Station layers">
+        <p class="filters__title">Search</p>
+        <div class="search">
+          <input
+            id="search-input"
+            class="search__input"
+            type="search"
+            placeholder="Name or station ID…"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Search stations by name or ID"
+            aria-controls="search-results"
+            aria-autocomplete="list"
+          />
+          <ul id="search-results" class="search__results" role="listbox" hidden></ul>
         </div>
-      </details>
-    </aside>
+        <p class="filters__title filters__title--layers">Layers</p>
+        <div id="filter-list" class="filters__list"></div>
+        <p class="filters__title filters__title--units">Units</p>
+        <div class="unit-toggle" role="group" aria-label="Display units">
+          <button type="button" id="unit-metric" class="unit-toggle__btn is-active" aria-pressed="true">
+            Metric
+          </button>
+          <button type="button" id="unit-us" class="unit-toggle__btn" aria-pressed="false">
+            US
+          </button>
+        </div>
+        <p class="unit-hint" id="unit-hint">°C · mm · cm · m</p>
+      </aside>
+
+      <aside class="legend" aria-label="Field legend">
+        <details>
+          <summary class="legend__summary">Field legend</summary>
+          <div class="legend__body">
+            <p class="legend__intro">
+              SON stores metric values from each provider. The same field can mean different
+              things by site type.
+            </p>
+
+            <section class="legend__section">
+              <h3 class="legend__heading">
+                <span class="filter-swatch filter-swatch--sntl" aria-hidden="true"></span>
+                SNOTEL / SCAN / MSTL (NRCS)
+              </h3>
+              <ul class="legend__list">
+                <li><strong>SWE</strong> — snow water equivalent (pillow)</li>
+                <li><strong>Snow depth</strong> — depth at the sensor</li>
+                <li><strong>Temperature</strong> — observed air temp</li>
+                <li>
+                  <strong>Precipitation</strong> — water-year
+                  <em>accumulation</em> (usually from Oct&nbsp;1), not this hour’s rain
+                </li>
+                <li><strong>Snowfall / wind / humidity</strong> — usually not provided</li>
+              </ul>
+            </section>
+
+            <section class="legend__section">
+              <h3 class="legend__heading">
+                <span class="filter-swatch filter-swatch--bcasws" aria-hidden="true"></span>
+                BC ASWS
+              </h3>
+              <ul class="legend__list">
+                <li><strong>SWE</strong> — snow water equivalent</li>
+                <li><strong>Snow depth</strong> — depth at the pillow</li>
+                <li><strong>Temperature</strong> — air temperature</li>
+                <li>
+                  <strong>Precipitation</strong> — seasonal / water-year
+                  <em>accumulation</em>, not hourly rainfall
+                </li>
+                <li><strong>Snowfall / wind / humidity</strong> — not in these CSVs</li>
+              </ul>
+            </section>
+
+            <section class="legend__section">
+              <h3 class="legend__heading">
+                <span class="filter-swatch filter-swatch--jma" aria-hidden="true"></span>
+                JMA AMeDAS
+              </h3>
+              <ul class="legend__list">
+                <li><strong>SWE</strong> — not available (always blank)</li>
+                <li><strong>Snow depth</strong> — current snow depth</li>
+                <li><strong>Snowfall</strong> — last 1 hour of snowfall</li>
+                <li><strong>Temperature</strong> — air temperature</li>
+                <li>
+                  <strong>Precipitation</strong> — last
+                  <em>1 hour</em> of rain/melt (not a year total)
+                </li>
+                <li><strong>Wind / humidity</strong> — when reported</li>
+              </ul>
+            </section>
+
+            <p class="legend__note">
+              The API always stores metric (°C, mm, cm, m). Use the Metric / US switch to
+              display °F, inches, and feet in the UI.
+            </p>
+          </div>
+        </details>
+      </aside>
+    </div>
 
     <main id="map" class="map" role="application" aria-label="Snow station map"></main>
 

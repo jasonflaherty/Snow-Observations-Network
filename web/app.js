@@ -453,6 +453,9 @@
     if (!enabled[entry.key]) {
       setLayerVisible(entry.key, true);
     }
+    if (window.matchMedia("(max-width: 900px)").matches) {
+      setMenuOpen(false);
+    }
     map.setView([entry.lat, entry.lon], Math.max(map.getZoom(), 10), { animate: true });
     onMarkerClick(entry.marker, entry.props);
   }
@@ -578,6 +581,35 @@
   unitMetricBtn.addEventListener("click", () => setUnitSystem("metric"));
   unitUsBtn.addEventListener("click", () => setUnitSystem("us"));
   syncUnitButtons();
+
+  const menuToggle = document.getElementById("menu-toggle");
+  const menuClose = document.getElementById("menu-close");
+  const menuPanel = document.getElementById("menu-panel");
+  const menuBackdrop = document.getElementById("menu-backdrop");
+
+  function setMenuOpen(open) {
+    menuPanel.classList.toggle("is-open", open);
+    menuBackdrop.hidden = !open;
+    menuToggle.setAttribute("aria-expanded", String(open));
+    menuToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    document.body.classList.toggle("menu-open", open);
+  }
+
+  menuToggle.addEventListener("click", () => {
+    setMenuOpen(!menuPanel.classList.contains("is-open"));
+  });
+  menuClose.addEventListener("click", () => setMenuOpen(false));
+  menuBackdrop.addEventListener("click", () => setMenuOpen(false));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && menuPanel.classList.contains("is-open")) {
+      setMenuOpen(false);
+    }
+  });
+  window.addEventListener("resize", () => {
+    if (window.matchMedia("(min-width: 901px)").matches) {
+      setMenuOpen(false);
+    }
+  });
 
   async function loadStations() {
     statusEl.textContent = "Loading stations…";
