@@ -149,6 +149,39 @@ body {
   margin-top: 0.9rem;
 }
 
+.filters__title--units {
+  margin-top: 0.9rem;
+}
+
+.unit-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+}
+
+.unit-toggle__btn {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid rgba(20, 32, 28, 0.18);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.unit-toggle__btn.is-active {
+  background: var(--pine);
+  border-color: var(--pine);
+  color: #f4f8f7;
+}
+
+.unit-toggle__btn:hover:not(.is-active) {
+  border-color: var(--pine);
+  color: var(--ink);
+}
+
 .search {
   position: relative;
   margin-bottom: 0.15rem;

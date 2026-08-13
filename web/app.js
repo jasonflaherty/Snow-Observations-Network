@@ -19,6 +19,8 @@
   const filterList = document.getElementById("filter-list");
   const searchInput = document.getElementById("search-input");
   const searchResults = document.getElementById("search-results");
+  const unitCBtn = document.getElementById("unit-c");
+  const unitFBtn = document.getElementById("unit-f");
   const modal = document.getElementById("modal");
   const modalTitle = document.getElementById("modal-title");
   const modalProvider = document.getElementById("modal-provider");
@@ -27,6 +29,11 @@
   const modalReadings = document.getElementById("modal-readings");
   const modalError = document.getElementById("modal-error");
   const modalApi = document.getElementById("modal-api");
+
+  const TEMP_KEY = "son-temp-unit";
+  let tempUnit = localStorage.getItem(TEMP_KEY) === "F" ? "F" : "C";
+  /** @type {{ props: object, detail: object | null } | null} */
+  let modalState = null;
 
   const map = L.map("map", {
     zoomControl: false,
@@ -105,6 +112,36 @@
     return unit ? `${text} ${unit}` : text;
   }
 
+  function cToF(celsius) {
+    return (celsius * 9) / 5 + 32;
+  }
+
+  function fmtTemp(celsius) {
+    if (celsius === null || celsius === undefined || Number.isNaN(Number(celsius))) {
+      return "—";
+    }
+    const c = Number(celsius);
+    if (tempUnit === "F") return fmt(cToF(c), "°F");
+    return fmt(c, "°C");
+  }
+
+  function syncUnitButtons() {
+    const isC = tempUnit === "C";
+    unitCBtn.classList.toggle("is-active", isC);
+    unitFBtn.classList.toggle("is-active", !isC);
+    unitCBtn.setAttribute("aria-pressed", String(isC));
+    unitFBtn.setAttribute("aria-pressed", String(!isC));
+  }
+
+  function setTempUnit(unit) {
+    tempUnit = unit === "F" ? "F" : "C";
+    localStorage.setItem(TEMP_KEY, tempUnit);
+    syncUnitButtons();
+    if (modalState && !modal.hidden) {
+      openModal(modalState.props, modalState.detail);
+    }
+  }
+
   function fmtTime(iso) {
     if (!iso) return "No observation yet";
     const d = new Date(iso);
@@ -124,6 +161,7 @@
   }
 
   function openModal(props, detail) {
+    modalState = { props, detail };
     modal.hidden = false;
     document.body.style.overflow = "hidden";
     const key = layerKey(props);
@@ -141,7 +179,7 @@
     setReadings([
       ["SWE", fmt(detail?.swe_mm ?? props.swe_mm, "mm")],
       ["Snow depth", fmt(detail?.snow_depth_cm ?? props.snow_depth_cm, "cm")],
-      ["Temperature", fmt(detail?.temperature_c ?? props.temperature_c, "°C")],
+      ["Temperature", fmtTemp(detail?.temperature_c ?? props.temperature_c)],
       ["Precipitation", fmt(detail?.precipitation_mm, "mm")],
       ["Elevation", fmt(props.elevation_m, "m")],
       ["Wind", fmt(detail?.wind_speed_ms, "m/s")],
@@ -155,6 +193,7 @@
   function closeModal() {
     modal.hidden = true;
     document.body.style.overflow = "";
+    modalState = null;
     if (activeMarker) {
       const p = activeMarker.__sonProps;
       activeMarker.setIcon(markerIcon(layerKey(p), false));
@@ -466,6 +505,10 @@
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".search")) hideSearchResults();
   });
+
+  unitCBtn.addEventListener("click", () => setTempUnit("C"));
+  unitFBtn.addEventListener("click", () => setTempUnit("F"));
+  syncUnitButtons();
 
   async function loadStations() {
     statusEl.textContent = "Loading stations…";
