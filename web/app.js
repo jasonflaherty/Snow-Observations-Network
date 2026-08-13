@@ -3,10 +3,15 @@
   const params = new URLSearchParams(window.location.search);
   const API_BASE = (params.get("api") || DEFAULT_API).replace(/\/$/, "");
 
-  /** Display order + defaults. Unknown providers appear after these, off by default. */
+  /**
+   * Layer keys = NRCS network codes (SNTL/SCAN/MSTL) or provider ids (BCASWS/JMA).
+   * Unknown layers appear after these, off by default.
+   */
   const LAYER_META = {
-    NRCS: { label: "SNOTEL", defaultOn: true, swatch: "nrcs" },
+    SNTL: { label: "SNOTEL", defaultOn: true, swatch: "sntl" },
     BCASWS: { label: "BC ASWS", defaultOn: true, swatch: "bcasws" },
+    SCAN: { label: "SCAN", defaultOn: false, swatch: "scan" },
+    MSTL: { label: "SNOTEL (MSTL)", defaultOn: false, swatch: "mstl" },
     JMA: { label: "JMA", defaultOn: false, swatch: "jma" },
   };
 
@@ -36,7 +41,7 @@
   }).addTo(map);
 
   /** @type {Record<string, L.LayerGroup>} */
-  const layersByProvider = {};
+  const layersByKey = {};
   /** @type {Record<string, boolean>} */
   const enabled = {};
   /** @type {Record<string, number>} */
@@ -44,37 +49,41 @@
   let activeMarker = null;
   let allFeatures = [];
 
-  function normalizeProvider(provider) {
-    return String(provider || "OTHER").toUpperCase();
+  function networkFromExternal(externalId) {
+    if (!externalId) return null;
+    const parts = String(externalId).split(":");
+    return parts.length >= 3 ? parts[parts.length - 1].toUpperCase() : null;
   }
 
-  function layerLabel(provider) {
-    const meta = LAYER_META[provider];
-    if (meta) return meta.label;
+  function layerKey(props) {
+    const provider = String(props.provider || "OTHER").toUpperCase();
+    if (provider === "NRCS") {
+      const net = String(props.network || networkFromExternal(props.external_id) || "NRCS").toUpperCase();
+      return net;
+    }
     return provider;
   }
 
-  function defaultEnabled(provider) {
-    return Boolean(LAYER_META[provider]?.defaultOn);
+  function layerLabel(key) {
+    return LAYER_META[key]?.label || key;
   }
 
-  function providerClass(provider) {
-    const key = normalizeProvider(provider);
-    if (key === "NRCS") return "son-marker--nrcs";
-    if (key === "BCASWS") return "son-marker--bcasws";
-    if (key === "JMA") return "son-marker--jma";
-    return "son-marker--other";
+  function defaultEnabled(key) {
+    return Boolean(LAYER_META[key]?.defaultOn);
   }
 
-  function swatchClass(provider) {
-    const meta = LAYER_META[provider];
-    return `filter-swatch filter-swatch--${meta?.swatch || "other"}`;
+  function markerClass(key) {
+    const swatch = LAYER_META[key]?.swatch || "other";
+    return `son-marker son-marker--${swatch}`;
   }
 
-  function markerIcon(provider, active) {
-    const cls = ["son-marker", providerClass(provider), active ? "is-active" : ""]
-      .filter(Boolean)
-      .join(" ");
+  function swatchClass(key) {
+    const swatch = LAYER_META[key]?.swatch || "other";
+    return `filter-swatch filter-swatch--${swatch}`;
+  }
+
+  function markerIcon(key, active) {
+    const cls = [markerClass(key), active ? "is-active" : ""].filter(Boolean).join(" ");
     return L.divIcon({
       className: "",
       html: `<div class="${cls}"></div>`,
@@ -112,9 +121,12 @@
   function openModal(props, detail) {
     modal.hidden = false;
     document.body.style.overflow = "hidden";
-    modalProvider.textContent = layerLabel(normalizeProvider(props.provider));
+    const key = layerKey(props);
+    modalProvider.textContent = layerLabel(key);
     modalTitle.textContent = props.name || props.id || "Station";
-    modalId.textContent = props.id || "";
+    modalId.textContent = props.external_id
+      ? `${props.id} · ${props.external_id}`
+      : props.id || "";
     modalError.hidden = true;
     modalError.textContent = "";
 
@@ -140,7 +152,7 @@
     document.body.style.overflow = "";
     if (activeMarker) {
       const p = activeMarker.__sonProps;
-      activeMarker.setIcon(markerIcon(p.provider, false));
+      activeMarker.setIcon(markerIcon(layerKey(p), false));
       activeMarker = null;
     }
   }
@@ -155,10 +167,10 @@
 
   async function onMarkerClick(marker, props) {
     if (activeMarker && activeMarker !== marker) {
-      activeMarker.setIcon(markerIcon(activeMarker.__sonProps.provider, false));
+      activeMarker.setIcon(markerIcon(layerKey(activeMarker.__sonProps), false));
     }
     activeMarker = marker;
-    marker.setIcon(markerIcon(props.provider, true));
+    marker.setIcon(markerIcon(layerKey(props), true));
 
     openModal(props, null);
     modalObserved.textContent = "Loading latest reading…";
@@ -199,8 +211,8 @@
 
   function fitVisible() {
     const bounds = [];
-    for (const [provider, group] of Object.entries(layersByProvider)) {
-      if (!enabled[provider]) continue;
+    for (const [key, group] of Object.entries(layersByKey)) {
+      if (!enabled[key]) continue;
       group.eachLayer((m) => {
         const ll = m.getLatLng && m.getLatLng();
         if (ll) bounds.push(ll);
@@ -211,31 +223,31 @@
     }
   }
 
-  function setLayerVisible(provider, on) {
-    enabled[provider] = on;
-    const group = layersByProvider[provider];
+  function setLayerVisible(key, on) {
+    enabled[key] = on;
+    const group = layersByKey[key];
     if (!group) return;
     if (on) {
       if (!map.hasLayer(group)) map.addLayer(group);
     } else {
       if (map.hasLayer(group)) map.removeLayer(group);
-      if (activeMarker && normalizeProvider(activeMarker.__sonProps.provider) === provider) {
+      if (activeMarker && layerKey(activeMarker.__sonProps) === key) {
         closeModal();
       }
     }
     updateStatus();
   }
 
-  function orderedProviders(providers) {
+  function orderedKeys(keys) {
     const known = Object.keys(LAYER_META);
-    const rest = providers.filter((p) => !known.includes(p)).sort();
-    return [...known.filter((p) => providers.includes(p)), ...rest];
+    const rest = keys.filter((k) => !known.includes(k)).sort();
+    return [...known.filter((k) => keys.includes(k)), ...rest];
   }
 
-  function buildFilterUI(providers) {
+  function buildFilterUI(keys) {
     filterList.innerHTML = "";
-    for (const provider of orderedProviders(providers)) {
-      const id = `filter-${provider}`;
+    for (const key of orderedKeys(keys)) {
+      const id = `filter-${key}`;
       const label = document.createElement("label");
       label.className = "filter-row";
       label.htmlFor = id;
@@ -243,22 +255,22 @@
       const input = document.createElement("input");
       input.type = "checkbox";
       input.id = id;
-      input.checked = enabled[provider];
+      input.checked = enabled[key];
       input.addEventListener("change", () => {
-        setLayerVisible(provider, input.checked);
+        setLayerVisible(key, input.checked);
         fitVisible();
       });
 
       const swatch = document.createElement("span");
-      swatch.className = swatchClass(provider);
+      swatch.className = swatchClass(key);
       swatch.setAttribute("aria-hidden", "true");
 
       const text = document.createElement("span");
-      text.textContent = layerLabel(provider);
+      text.textContent = layerLabel(key);
 
       const count = document.createElement("span");
       count.className = "filter-count";
-      count.textContent = String(counts[provider] || 0);
+      count.textContent = String(counts[key] || 0);
 
       label.append(input, swatch, text, count);
       filterList.append(label);
@@ -266,11 +278,11 @@
   }
 
   function renderMarkers(features) {
-    for (const group of Object.values(layersByProvider)) {
+    for (const group of Object.values(layersByKey)) {
       group.clearLayers();
       if (map.hasLayer(group)) map.removeLayer(group);
     }
-    Object.keys(layersByProvider).forEach((k) => delete layersByProvider[k]);
+    Object.keys(layersByKey).forEach((k) => delete layersByKey[k]);
     Object.keys(counts).forEach((k) => delete counts[k]);
 
     for (const f of features) {
@@ -280,31 +292,31 @@
       const [lon, lat] = coords;
       if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
 
-      const provider = normalizeProvider(props.provider);
-      if (!layersByProvider[provider]) {
-        layersByProvider[provider] = L.layerGroup();
-        counts[provider] = 0;
-        if (enabled[provider] === undefined) {
-          enabled[provider] = defaultEnabled(provider);
+      const key = layerKey(props);
+      if (!layersByKey[key]) {
+        layersByKey[key] = L.layerGroup();
+        counts[key] = 0;
+        if (enabled[key] === undefined) {
+          enabled[key] = defaultEnabled(key);
         }
       }
-      counts[provider] += 1;
+      counts[key] += 1;
 
       const marker = L.marker([lat, lon], {
-        icon: markerIcon(provider, false),
+        icon: markerIcon(key, false),
         title: props.name || props.id,
       });
       marker.__sonProps = props;
       marker.on("click", () => onMarkerClick(marker, props));
-      marker.addTo(layersByProvider[provider]);
+      marker.addTo(layersByKey[key]);
     }
 
-    const providers = Object.keys(layersByProvider);
-    buildFilterUI(providers);
+    const keys = Object.keys(layersByKey);
+    buildFilterUI(keys);
 
-    for (const provider of providers) {
-      if (enabled[provider]) {
-        map.addLayer(layersByProvider[provider]);
+    for (const key of keys) {
+      if (enabled[key]) {
+        map.addLayer(layersByKey[key]);
       }
     }
 

@@ -7,7 +7,7 @@ import redis
 
 from son_core.config import get_settings
 
-MAP_CACHE_KEY = "son:cache:map:stations"
+MAP_CACHE_KEY = "son:cache:map:stations:v2"
 MAP_CACHE_TTL_SECONDS = 300
 
 

@@ -9,6 +9,16 @@ from worker.cache import get_map_cache, set_map_cache
 router = APIRouter(prefix="/v1/map", tags=["map"])
 
 
+def _network_code(st: Station) -> str | None:
+    """AWDB-style network from external_id (e.g. 301:CA:SNTL → SNTL)."""
+    if not st.external_id:
+        return None
+    parts = st.external_id.split(":")
+    if len(parts) >= 3:
+        return parts[-1].upper()
+    return None
+
+
 @router.get("/stations")
 def map_stations(db: Session = Depends(get_db)) -> dict:
     cached = get_map_cache()
@@ -36,6 +46,8 @@ def map_stations(db: Session = Depends(get_db)) -> dict:
                     "id": st.id,
                     "name": st.name,
                     "provider": st.provider_id,
+                    "network": _network_code(st),
+                    "external_id": st.external_id,
                     "elevation_m": st.elevation_m,
                     "swe_mm": obs.swe_mm if obs else None,
                     "snow_depth_cm": obs.snow_depth_cm if obs else None,

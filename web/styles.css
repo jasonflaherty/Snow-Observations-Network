@@ -171,12 +171,20 @@ body {
   flex-shrink: 0;
 }
 
-.filter-swatch--nrcs {
+.filter-swatch--sntl {
   background: #6f9ea8;
 }
 
 .filter-swatch--bcasws {
   background: #3d7a5c;
+}
+
+.filter-swatch--scan {
+  background: #c4a35a;
+}
+
+.filter-swatch--mstl {
+  background: #7a8f9e;
 }
 
 .filter-swatch--jma {
@@ -225,12 +233,20 @@ body {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.son-marker--nrcs {
+.son-marker--sntl {
   background: #6f9ea8;
 }
 
 .son-marker--bcasws {
   background: #3d7a5c;
+}
+
+.son-marker--scan {
+  background: #c4a35a;
+}
+
+.son-marker--mstl {
+  background: #7a8f9e;
 }
 
 .son-marker--jma {
