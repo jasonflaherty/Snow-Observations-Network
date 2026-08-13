@@ -71,6 +71,75 @@
       </div>
     </aside>
 
+    <aside class="legend" aria-label="Field legend">
+      <details>
+        <summary class="legend__summary">Field legend</summary>
+        <div class="legend__body">
+          <p class="legend__intro">
+            SON stores metric values from each provider. The same field can mean different
+            things by site type.
+          </p>
+
+          <section class="legend__section">
+            <h3 class="legend__heading">
+              <span class="filter-swatch filter-swatch--sntl" aria-hidden="true"></span>
+              SNOTEL / SCAN / MSTL (NRCS)
+            </h3>
+            <ul class="legend__list">
+              <li><strong>SWE</strong> — snow water equivalent (pillow)</li>
+              <li><strong>Snow depth</strong> — depth at the sensor</li>
+              <li><strong>Temperature</strong> — observed air temp</li>
+              <li>
+                <strong>Precipitation</strong> — water-year
+                <em>accumulation</em> (usually from Oct&nbsp;1), not this hour’s rain
+              </li>
+              <li><strong>Snowfall / wind / humidity</strong> — usually not provided</li>
+            </ul>
+          </section>
+
+          <section class="legend__section">
+            <h3 class="legend__heading">
+              <span class="filter-swatch filter-swatch--bcasws" aria-hidden="true"></span>
+              BC ASWS
+            </h3>
+            <ul class="legend__list">
+              <li><strong>SWE</strong> — snow water equivalent</li>
+              <li><strong>Snow depth</strong> — depth at the pillow</li>
+              <li><strong>Temperature</strong> — air temperature</li>
+              <li>
+                <strong>Precipitation</strong> — seasonal / water-year
+                <em>accumulation</em>, not hourly rainfall
+              </li>
+              <li><strong>Snowfall / wind / humidity</strong> — not in these CSVs</li>
+            </ul>
+          </section>
+
+          <section class="legend__section">
+            <h3 class="legend__heading">
+              <span class="filter-swatch filter-swatch--jma" aria-hidden="true"></span>
+              JMA AMeDAS
+            </h3>
+            <ul class="legend__list">
+              <li><strong>SWE</strong> — not available (always blank)</li>
+              <li><strong>Snow depth</strong> — current snow depth</li>
+              <li><strong>Snowfall</strong> — last 1 hour of snowfall</li>
+              <li><strong>Temperature</strong> — air temperature</li>
+              <li>
+                <strong>Precipitation</strong> — last
+                <em>1 hour</em> of rain/melt (not a year total)
+              </li>
+              <li><strong>Wind / humidity</strong> — when reported</li>
+            </ul>
+          </section>
+
+          <p class="legend__note">
+            API units are always metric (°C, mm, cm). Use the °C/°F switch for temperature
+            display only.
+          </p>
+        </div>
+      </details>
+    </aside>
+
     <main id="map" class="map" role="application" aria-label="Snow station map"></main>
 
     <div id="modal" class="modal" hidden>
@@ -89,6 +158,7 @@
         <p class="modal__id" id="modal-id"></p>
         <p class="modal__observed" id="modal-observed"></p>
         <dl class="readings" id="modal-readings"></dl>
+        <p class="modal__meaning" id="modal-meaning"></p>
         <p class="modal__error" id="modal-error" hidden></p>
         <a class="modal__api" id="modal-api" href="#" target="_blank" rel="noopener"
           >Open in API</a

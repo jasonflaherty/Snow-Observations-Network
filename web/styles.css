@@ -182,6 +182,101 @@ body {
   color: var(--ink);
 }
 
+.legend {
+  position: absolute;
+  z-index: 500;
+  top: 7.5rem;
+  right: 1.5rem;
+  width: min(20rem, calc(100vw - 2rem));
+  background: rgba(248, 251, 252, 0.94);
+  border: 1px solid rgba(20, 32, 28, 0.1);
+  border-radius: 4px;
+  backdrop-filter: blur(10px);
+  animation: rise 0.7s ease-out 0.28s both;
+  pointer-events: auto;
+  max-height: min(70vh, 36rem);
+  overflow: auto;
+}
+
+.legend__summary {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  list-style: none;
+}
+
+.legend__summary::-webkit-details-marker {
+  display: none;
+}
+
+.legend__summary::after {
+  content: "+";
+  float: right;
+  font-weight: 700;
+  color: var(--pine);
+}
+
+.legend details[open] > .legend__summary::after {
+  content: "–";
+}
+
+.legend__body {
+  padding: 0 1rem 1rem;
+}
+
+.legend__intro,
+.legend__note {
+  margin: 0 0 0.85rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.legend__note {
+  margin: 0.75rem 0 0;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(20, 32, 28, 0.08);
+}
+
+.legend__section {
+  margin: 0 0 0.85rem;
+}
+
+.legend__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.legend__list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.legend__list li {
+  margin: 0.2rem 0;
+}
+
+.legend__list strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.legend__list em {
+  font-style: italic;
+}
+
 .search {
   position: relative;
   margin-bottom: 0.15rem;
@@ -492,6 +587,16 @@ body {
   font-size: 0.9rem;
 }
 
+.modal__meaning {
+  margin: 1rem 0 0;
+  padding: 0.75rem 0.8rem;
+  background: rgba(31, 77, 58, 0.06);
+  border-left: 3px solid var(--pine);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
 .modal__api {
   display: inline-block;
   margin-top: 1.25rem;
@@ -568,7 +673,16 @@ body {
     left: 1rem;
     right: 1rem;
     width: auto;
-    max-height: min(55vh, 28rem);
+    max-height: min(40vh, 22rem);
     overflow: auto;
+  }
+
+  .legend {
+    top: auto;
+    bottom: calc(1rem + min(40vh, 22rem) + 0.5rem);
+    left: 1rem;
+    right: 1rem;
+    width: auto;
+    max-height: min(28vh, 16rem);
   }
 }

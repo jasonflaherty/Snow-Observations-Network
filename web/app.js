@@ -28,6 +28,7 @@
   const modalObserved = document.getElementById("modal-observed");
   const modalReadings = document.getElementById("modal-readings");
   const modalError = document.getElementById("modal-error");
+  const modalMeaning = document.getElementById("modal-meaning");
   const modalApi = document.getElementById("modal-api");
 
   const TEMP_KEY = "son-temp-unit";
@@ -160,6 +161,19 @@
     }
   }
 
+  function fieldMeaning(key) {
+    if (key === "JMA") {
+      return "JMA: precipitation is the last 1 hour (not a year total). Snowfall is last 1 hour. No SWE. Temperature is air temp.";
+    }
+    if (key === "BCASWS") {
+      return "BC ASWS: precipitation is seasonal / water-year accumulation, not hourly rainfall. SWE and snow depth are pillow readings.";
+    }
+    if (key === "SNTL" || key === "SCAN" || key === "MSTL") {
+      return "NRCS: precipitation (PREC) is water-year accumulation (typically from Oct 1), not this hour’s rain. SWE is pillow snow water equivalent.";
+    }
+    return "Field meanings vary by provider — see the Field legend for details.";
+  }
+
   function openModal(props, detail) {
     modalState = { props, detail };
     modal.hidden = false;
@@ -172,6 +186,7 @@
       : props.id || "";
     modalError.hidden = true;
     modalError.textContent = "";
+    modalMeaning.textContent = fieldMeaning(key);
 
     const observed = detail?.timestamp || props.observed_at;
     modalObserved.textContent = `Observed ${fmtTime(observed)}`;
@@ -179,6 +194,7 @@
     setReadings([
       ["SWE", fmt(detail?.swe_mm ?? props.swe_mm, "mm")],
       ["Snow depth", fmt(detail?.snow_depth_cm ?? props.snow_depth_cm, "cm")],
+      ["Snowfall", fmt(detail?.snowfall_cm, "cm")],
       ["Temperature", fmtTemp(detail?.temperature_c ?? props.temperature_c)],
       ["Precipitation", fmt(detail?.precipitation_mm, "mm")],
       ["Elevation", fmt(props.elevation_m, "m")],
