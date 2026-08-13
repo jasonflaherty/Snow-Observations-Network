@@ -17,6 +17,8 @@
 
   const statusEl = document.getElementById("status");
   const filterList = document.getElementById("filter-list");
+  const searchInput = document.getElementById("search-input");
+  const searchResults = document.getElementById("search-results");
   const modal = document.getElementById("modal");
   const modalTitle = document.getElementById("modal-title");
   const modalProvider = document.getElementById("modal-provider");
@@ -46,8 +48,11 @@
   const enabled = {};
   /** @type {Record<string, number>} */
   const counts = {};
+  /** @type {Array<{props: object, key: string, lat: number, lon: number, marker: L.Marker}>} */
+  let stationIndex = [];
   let activeMarker = null;
   let allFeatures = [];
+  let searchActiveIndex = -1;
 
   function networkFromExternal(externalId) {
     if (!externalId) return null;
@@ -235,7 +240,113 @@
         closeModal();
       }
     }
+    const checkbox = document.getElementById(`filter-${key}`);
+    if (checkbox && checkbox.checked !== on) checkbox.checked = on;
     updateStatus();
+  }
+
+  function hideSearchResults() {
+    searchResults.hidden = true;
+    searchResults.innerHTML = "";
+    searchActiveIndex = -1;
+  }
+
+  function searchHaystack(props) {
+    const id = String(props.id || "");
+    const code = id.includes("-") ? id.split("-").pop() : id;
+    return [
+      props.name,
+      props.id,
+      props.external_id,
+      code,
+      props.provider,
+      props.network,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+  }
+
+  function rankMatch(query, props) {
+    const q = query.toLowerCase().trim();
+    if (!q) return 0;
+    const name = String(props.name || "").toLowerCase();
+    const id = String(props.id || "").toLowerCase();
+    const ext = String(props.external_id || "").toLowerCase();
+    const code = id.includes("-") ? id.split("-").pop() : id;
+    if (id === q || ext === q || code === q) return 100;
+    if (id.startsWith(q) || code.startsWith(q)) return 90;
+    if (name.startsWith(q)) return 80;
+    if (id.includes(q) || ext.includes(q) || code.includes(q)) return 70;
+    if (name.includes(q)) return 60;
+    if (searchHaystack(props).includes(q)) return 40;
+    return 0;
+  }
+
+  function findStations(query) {
+    const q = query.trim();
+    if (q.length < 2) return [];
+    return stationIndex
+      .map((entry) => ({ entry, score: rankMatch(q, entry.props) }))
+      .filter((row) => row.score > 0)
+      .sort((a, b) => b.score - a.score || String(a.entry.props.name).localeCompare(String(b.entry.props.name)))
+      .slice(0, 12)
+      .map((row) => row.entry);
+  }
+
+  function renderSearchResults(matches) {
+    searchResults.innerHTML = "";
+    searchActiveIndex = -1;
+    if (!searchInput.value.trim()) {
+      hideSearchResults();
+      return;
+    }
+    if (!matches.length) {
+      const empty = document.createElement("li");
+      empty.className = "search__empty";
+      empty.textContent = "No stations found";
+      searchResults.append(empty);
+      searchResults.hidden = false;
+      return;
+    }
+    matches.forEach((entry, index) => {
+      const li = document.createElement("li");
+      li.setAttribute("role", "option");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "search__option";
+      btn.dataset.index = String(index);
+      const name = document.createElement("span");
+      name.className = "search__option-name";
+      name.textContent = entry.props.name || entry.props.id;
+      const id = document.createElement("span");
+      id.className = "search__option-id";
+      id.textContent = `${layerLabel(entry.key)} · ${entry.props.id}`;
+      btn.append(name, id);
+      btn.addEventListener("click", () => selectStation(entry));
+      li.append(btn);
+      searchResults.append(li);
+    });
+    searchResults.hidden = false;
+  }
+
+  function highlightSearchOption(index) {
+    const options = [...searchResults.querySelectorAll(".search__option")];
+    options.forEach((el, i) => el.classList.toggle("is-active", i === index));
+    searchActiveIndex = index;
+    if (index >= 0 && options[index]) {
+      options[index].scrollIntoView({ block: "nearest" });
+    }
+  }
+
+  function selectStation(entry) {
+    hideSearchResults();
+    searchInput.value = entry.props.name || entry.props.id || "";
+    if (!enabled[entry.key]) {
+      setLayerVisible(entry.key, true);
+    }
+    map.setView([entry.lat, entry.lon], Math.max(map.getZoom(), 10), { animate: true });
+    onMarkerClick(entry.marker, entry.props);
   }
 
   function orderedKeys(keys) {
@@ -284,6 +395,7 @@
     }
     Object.keys(layersByKey).forEach((k) => delete layersByKey[k]);
     Object.keys(counts).forEach((k) => delete counts[k]);
+    stationIndex = [];
 
     for (const f of features) {
       const coords = f.geometry && f.geometry.coordinates;
@@ -309,6 +421,7 @@
       marker.__sonProps = props;
       marker.on("click", () => onMarkerClick(marker, props));
       marker.addTo(layersByKey[key]);
+      stationIndex.push({ props, key, lat, lon, marker });
     }
 
     const keys = Object.keys(layersByKey);
@@ -323,6 +436,36 @@
     updateStatus();
     fitVisible();
   }
+
+  searchInput.addEventListener("input", () => {
+    renderSearchResults(findStations(searchInput.value));
+  });
+
+  searchInput.addEventListener("keydown", (e) => {
+    const options = [...searchResults.querySelectorAll(".search__option")];
+    if (e.key === "ArrowDown" && options.length) {
+      e.preventDefault();
+      highlightSearchOption(Math.min(searchActiveIndex + 1, options.length - 1));
+    } else if (e.key === "ArrowUp" && options.length) {
+      e.preventDefault();
+      highlightSearchOption(Math.max(searchActiveIndex - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (searchActiveIndex >= 0 && options[searchActiveIndex]) {
+        options[searchActiveIndex].click();
+        return;
+      }
+      const matches = findStations(searchInput.value);
+      if (matches.length) selectStation(matches[0]);
+    } else if (e.key === "Escape") {
+      hideSearchResults();
+      searchInput.blur();
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".search")) hideSearchResults();
+  });
 
   async function loadStations() {
     statusEl.textContent = "Loading stations…";
