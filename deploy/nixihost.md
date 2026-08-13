@@ -171,7 +171,7 @@ DEPLOY_REF=main ./deploy/deploy.sh
 
 - **Logs:** `docker compose -f docker-compose.prod.yml logs -f api celery-worker`
 - **Disk:** raw AWDB/CSV archives live in the `rawdata` volume — prune later if storage is tight
-- **CORS:** not enabled yet; native/mobile apps are fine. Browser apps need CORS or a same-origin proxy
+- **CORS:** browser origins via `CORS_ORIGINS` (defaults include GitHub Pages)
 - If the box OOMs during NRCS backfill, pause and run with fewer stations first, or upgrade to 4GB
 
 ## Checklist

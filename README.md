@@ -78,6 +78,20 @@ pytest
 
 See [docs/architecture.md](docs/architecture.md) and [docs/providers.md](docs/providers.md).
 
+## Explorer (GitHub Pages)
+
+Static map UI in [`web/`](web/) — markers from `/v1/map/stations`, click opens a modal with `/current`.
+
+Live (after Pages deploy): https://jasonflaherty.github.io/Snow-Observations-Network/
+
+```bash
+# local preview
+python3 -m http.server 8080 --directory web
+# open http://127.0.0.1:8080
+```
+
+The API must allow the Pages origin via `CORS_ORIGINS` (defaults include `https://jasonflaherty.github.io`).
+
 ## Production (NixiHost 2GB VPS)
 
 See [deploy/nixihost.md](deploy/nixihost.md) for first-time install and **GitHub → VPS** deploys (Actions + `deploy/deploy.sh`):

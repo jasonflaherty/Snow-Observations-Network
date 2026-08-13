@@ -24,6 +24,15 @@ class Settings(BaseSettings):
 
     raw_storage_path: str = "storage/raw"
 
+    # Comma-separated browser origins allowed to call the API (GitHub Pages, local preview)
+    cors_origins: str = (
+        "https://jasonflaherty.github.io,"
+        "http://localhost:8080,"
+        "http://127.0.0.1:8080,"
+        "http://localhost:5500,"
+        "http://127.0.0.1:5500"
+    )
+
 
 @lru_cache
 def get_settings() -> Settings:

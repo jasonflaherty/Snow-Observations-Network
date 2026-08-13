@@ -47,11 +47,12 @@ Every provider download is written under:
 ## Deferred (not Phase 1)
 
 - MinIO / S3 object storage
-- Caddy, Prometheus, Grafana
-- SON Explorer web map
+- Prometheus, Grafana
 - Flutter / SnoTel Mapper integration
 - Europe / satellite providers
 - Climatology and ML forecasts
+
+Explorer map UI: [`web/`](../web/) on GitHub Pages.
 
 ## Attribution
 

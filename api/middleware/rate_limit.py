@@ -11,6 +11,8 @@ from worker.cache import get_redis
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        if request.method == "OPTIONS":
+            return await call_next(request)
         if request.url.path in {"/health", "/docs", "/openapi.json", "/redoc"}:
             return await call_next(request)
 
