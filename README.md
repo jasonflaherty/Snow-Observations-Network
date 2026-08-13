@@ -29,6 +29,10 @@ podman-compose exec celery-worker \
 # One-time 7-day BC ASWS backfill from province CSVs
 podman-compose exec celery-worker \
   python -c "from worker.ingest import ingest_bc_asws_backfill; print(ingest_bc_asws_backfill())"
+
+# One-time 7-day JMA AMeDAS backfill from Bosai map JSON
+podman-compose exec celery-worker \
+  python -c "from worker.ingest import ingest_jma_backfill; print(ingest_jma_backfill())"
 ```
 
 (`docker compose exec ...` works the same if you use Docker instead of Podman.)
@@ -39,6 +43,7 @@ podman-compose exec celery-worker \
 curl http://localhost:8000/v1/stations
 curl http://localhost:8000/v1/stations/SON-CA-BCASWS-1A01P/current
 curl "http://localhost:8000/v1/stations/SON-US-NRCS-301/observations?limit=100"
+curl "http://localhost:8000/v1/stations?country=JP"
 curl http://localhost:8000/v1/map/stations
 ```
 
@@ -52,7 +57,7 @@ Anonymous clients are limited to 1000 requests/day (Redis-backed).
 
 ## Station IDs
 
-`SON-{CC}-{PROVIDER}-{CODE}` — e.g. `SON-US-NRCS-301`, `SON-CA-BCASWS-2F05P`.
+`SON-{CC}-{PROVIDER}-{CODE}` — e.g. `SON-US-NRCS-301`, `SON-CA-BCASWS-2F05P`, `SON-JP-JMA-11016`.
 
 ## Local tests
 
@@ -69,6 +74,7 @@ pytest
 |----------|--------|---------|
 | NRCS SNOTEL (SNTL) | USDA AWDB REST `/stations`, `/data` | Hourly 48h upsert; optional 7-day backfill |
 | BC ASWS | Province CSVs (`SW/SD/PC/TA.csv`) + seeded catalog | Hourly 48h upsert; optional 7-day backfill |
+| JMA AMeDAS | Bosai JSON `amedastable` + hourly `map/{stamp}.json` | Hourly 48h upsert; optional 7-day backfill |
 
 See [docs/architecture.md](docs/architecture.md) and [docs/providers.md](docs/providers.md).
 
@@ -92,3 +98,4 @@ MIT — see [LICENSE](LICENSE).
 
 - USDA Natural Resources Conservation Service AWDB / SNOTEL
 - Province of British Columbia ASWS (Open Government Licence – British Columbia)
+- Japan Meteorological Agency (JMA) AMeDAS

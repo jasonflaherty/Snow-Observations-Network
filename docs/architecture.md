@@ -2,7 +2,7 @@
 
 ## Goal
 
-Ingest snow observations from NRCS AWDB and BC ASWS, normalize to metric units, store in PostGIS, and expose a versioned HTTP API.
+Ingest snow observations from NRCS AWDB, BC ASWS, and JMA AMeDAS, normalize to metric units, store in PostGIS, and expose a versioned HTTP API.
 
 ## Services
 
@@ -22,8 +22,9 @@ Examples:
 
 - `SON-US-NRCS-301`
 - `SON-CA-BCASWS-2F05P`
+- `SON-JP-JMA-11016`
 
-Provider triplets are stored as `external_id` for client migration (`301:CA:SNTL`, `2F05P:BC:ASWS`).
+Provider triplets are stored as `external_id` for client migration (`301:CA:SNTL`, `2F05P:BC:ASWS`). JMA uses the AMeDAS station code as `external_id`.
 
 ## Units
 
@@ -35,7 +36,7 @@ API and database use metric:
 - `precipitation_mm`
 - `wind_speed_ms`
 
-NRCS imperial values are converted on ingest.
+NRCS imperial values are converted on ingest. JMA AMeDAS values are already metric (no SWE).
 
 ## Raw archive
 
@@ -49,10 +50,11 @@ Every provider download is written under:
 - Caddy, Prometheus, Grafana
 - SON Explorer web map
 - Flutter / SnoTel Mapper integration
-- Europe / Japan / satellite providers
+- Europe / satellite providers
 - Climatology and ML forecasts
 
 ## Attribution
 
 - USDA NRCS AWDB / SNOTEL
 - British Columbia ASWS under the Open Government Licence – British Columbia
+- Japan Meteorological Agency (JMA) AMeDAS

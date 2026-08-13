@@ -25,3 +25,25 @@ Observation pull params: `duration=HOURLY`, `elements=WTEQ,SNWD,TOBS,PREC`, batc
 - **Hourly job:** last **48 hours** (CSV already holds water-year history; filter locally, upsert)
 - **7-day backfill:** `ingest_bc_asws_backfill()` → last **168 hours**
 - Station IDs: `SON-CA-BCASWS-{CODE}` (e.g. `SON-CA-BCASWS-2F05P`)
+
+## JMA AMeDAS
+
+Bosai JSON (no API key):
+
+| Purpose | Endpoint |
+|---------|----------|
+| Station catalog | `GET https://www.jma.go.jp/bosai/amedas/const/amedastable.json` |
+| Latest timestamp | `GET https://www.jma.go.jp/bosai/amedas/data/latest_time.txt` |
+| Nationwide snapshot | `GET https://www.jma.go.jp/bosai/amedas/data/map/{YYYYMMDDHHMMSS}.json` |
+
+Map timestamps are **JST**. Values are `[value, aqc]` arrays; only `aqc == 0` is kept.
+
+Field mapping: `snow` → `snow_depth_cm`, `snow1h` → `snowfall_cm`, `temp` → `temperature_c`, `precipitation1h` → `precipitation_mm`, `wind` → `wind_speed_ms`, `humidity` → `humidity`. **No SWE** (`swe_mm` always null).
+
+- **Catalog:** all AMeDAS sites (~1286); `active=true` only when `elems[5] == '1'` (snow depth capability, ~330 sites)
+- **Observation ingest:** snow-capable stations only; **hourly on-the-hour** map snapshots (not every 10 minutes)
+- **Hourly job:** last **48 hours**
+- **7-day backfill:** `ingest_jma_backfill()` → last **168 hours**
+- Station IDs: `SON-JP-JMA-{CODE}` (e.g. `SON-JP-JMA-11016`)
+- Attribution: [JMA website terms](https://www.jma.go.jp/jma/kishou/info/coment.html)
+- Raw JSON archived under `storage/raw/YYYY/MM/DD/jma/`

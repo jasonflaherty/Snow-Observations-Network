@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from database.models import Observation, Station
 from database.session import SessionLocal
 from providers.bc_asws.importer import BcAswsProvider
+from providers.jma.importer import JmaProvider
 from providers.nrcs.importer import NrcsProvider
 from son_core.ids import make_son_id
 from worker.cache import invalidate_map_cache
@@ -239,8 +240,40 @@ def ingest_bc_asws_backfill(*, hours: int = 168) -> dict:
     return ingest_bc_asws(hours=hours)
 
 
+def ingest_jma(*, hours: int = 48) -> dict:
+    """Ingest JMA AMeDAS hourly map snapshots for snow-capable stations.
+
+    Hourly cadence uses hours=48. Use ``ingest_jma_backfill`` for 7 days.
+    """
+    provider = JmaProvider()
+    db = SessionLocal()
+    try:
+        stations = provider.get_stations()
+        n_stations = upsert_stations(db, stations)
+        end = datetime.now(timezone.utc)
+        start = end - timedelta(hours=hours)
+        observations = provider.get_observations(start=start, end=end)
+        n_obs = upsert_observations(db, observations)
+        invalidate_map_cache()
+        return {
+            "provider": "JMA",
+            "stations": n_stations,
+            "snow_stations": sum(1 for s in stations if s.active),
+            "hours": hours,
+            "observations": n_obs,
+        }
+    finally:
+        provider.close()
+        db.close()
+
+
+def ingest_jma_backfill(*, hours: int = 168) -> dict:
+    """On-demand JMA AMeDAS observation backfill (default 7 days)."""
+    return ingest_jma(hours=hours)
+
+
 def ingest_all() -> dict:
-    """Hourly job: NRCS/SNTL + BC ASWS last 48h (upsert)."""
+    """Hourly job: NRCS/SNTL + BC ASWS + JMA AMeDAS last 48h (upsert)."""
     results: dict = {}
     try:
         results["nrcs"] = ingest_nrcs(hours=48, max_stations=None)
@@ -254,4 +287,10 @@ def ingest_all() -> dict:
     except Exception as exc:  # noqa: BLE001
         logger.exception("Ingest bc_asws failed")
         results["bc_asws"] = {"error": str(exc)}
+    try:
+        results["jma"] = ingest_jma(hours=48)
+        logger.info("Ingest jma ok: %s", results["jma"])
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("Ingest jma failed")
+        results["jma"] = {"error": str(exc)}
     return results
